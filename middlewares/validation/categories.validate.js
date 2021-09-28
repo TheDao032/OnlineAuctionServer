@@ -47,15 +47,11 @@ const newCategoryChild = (req, res, next) => {
 	const shemaQuery = {
 		type: 'object',
 		properties: {
-		  id: { type: 'string', pattern: "^\\d+$" }
+		  id: { type: 'string', pattern: '^\\d+$' }
 		},
 	  required: ['id'],
 	  additionalProperties: true
   	}
-
-  const ajv = new ajvLib({
-	  allErrors: true
-  })
 
 	const validatorBody = ajv.compile(shemaBody)
 	const validBody = validatorBody(req.body)
@@ -167,8 +163,8 @@ const paramsInfo = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		page: { type: 'integer' },
-			limit: { type: 'integer' }
+    		page: { type: 'string', pattern: '^\\d+$' },
+			limit: { type: 'string', pattern: '^\\d+$' }
   		},
 		required: [],
 		additionalProperties: true

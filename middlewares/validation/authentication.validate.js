@@ -7,9 +7,9 @@ const login = (req, res, next) => {
 		type: 'object',
 		properties: {
 			accEmail: { type: 'string', pattern: '' },
-			accPassWord: { type: 'string', pattern: '', }
+			accPassword: { type: 'string', pattern: '' }
 		},
-		required: ['accEmail', 'accPassWord'],
+		required: ['accEmail', 'accPassword'],
 		additionalProperties: false
 	}
 
@@ -34,12 +34,12 @@ const register = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		accPassWord: { type: 'string', pattern: '', minLength: 1 },
+    		accPassword: { type: 'string', pattern: '', minLength: 1 },
     		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
     		accPhoneNumber: { type: 'string', pattern: '', maxLength: 15 },
     		accRole: { type: 'string', pattern: '', maxLength: 5}
   		},
-		required: ['accPassWord', 'accEmail'],
+		required: ['accPassword', 'accEmail'],
 		additionalProperties: true
 	}
 

@@ -21,8 +21,9 @@ router.use((req, res, next) => {
 })
 
 router.use((err, req, res, next) => {
+	console.log(err)
 	return res.status(500).json({
-		err,
+		err: err,
 		statusCode: 1
 	})
 })

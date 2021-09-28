@@ -37,7 +37,7 @@ router.post('/list', productValidation.paramsInfo, async (req, res) => {
 				cateId: fatherInfo.cate_id,
 				cateName: fatherInfo.cate_name,
 				subCategories: listChild.map((itemChild) => {
-					const createDate = moment(new Date(itemChild.cate_created_date)).format("DD-MM-YYYY")					
+					const createDate = moment(new Date(itemChild.cate_created_date)).format("YYYY-MM-DD")					
 
 					return {
 						cateId: itemChild.cate_id,
@@ -55,7 +55,7 @@ router.post('/list', productValidation.paramsInfo, async (req, res) => {
 				cateId: fatherInfo.cate_id,
 				cateName: fatherInfo.cate_name,
 				subCategories: listChild.map((itemChild) => {
-					const createDate = moment(new Date(itemChild.cate_created_date)).format("DD-MM-YYYY")
+					const createDate = moment(new Date(itemChild.cate_created_date)).format("YYYY-MM-DD")
 
 					return {
 						cateId: itemChild.cate_id,
@@ -147,8 +147,8 @@ router.post('/list', productValidation.paramsInfo, async (req, res) => {
 	// 		prod_category_name: result[index].cate_name,
 	// 		prod_amount: result[index].prod_amount,
 	// 		prod_description: result[index].prod_description,
-	// 		prod_created_date: moment(result[index].prod_created_date).format('DD/MM/YYYY'),
-	// 		prod_updated_date: moment(result[index].prod_updated_date).format('DD/MM/YYYY') == 'Invalid date' ? moment(result[index].prod_created_date).format('DD/MM/YYYY') : moment(result[index].prod_updated_date).format('DD/MM/YYYY'),
+	// 		prod_created_date: moment(result[index].prod_created_date).format('YYYY-MM-DD'),
+	// 		prod_updated_date: moment(result[index].prod_updated_date).format('YYYY-MM-DD') == 'Invalid date' ? moment(result[index].prod_created_date).format('YYYY-MM-DD') : moment(result[index].prod_updated_date).format('YYYY-MM-DD'),
 	// 		prod_price: result[index].prod_price
 	// 	}
 
@@ -220,8 +220,8 @@ router.post('/list-best-sale', productValidation.listBestSale, async (req, res) 
 			prod_category_id: result[index].prod_category_id,
 			prod_amount: result[index].prod_amount,
 			prod_description: result[index].prod_description,
-			prod_created_date: moment(result[index].prod_created_date).format('DD/MM/YYYY'),
-			prod_updated_date: moment(result[index].prod_updated_date).format('DD/MM/YYYY') == 'Invalid date' ? moment(result[index].prod_created_date).format('DD/MM/YYYY') : moment(result[index].prod_updated_date).format('DD/MM/YYYY'),
+			prod_created_date: moment(result[index].prod_created_date).format('YYYY-MM-DD'),
+			prod_updated_date: moment(result[index].prod_updated_date).format('YYYY-MM-DD') == 'Invalid date' ? moment(result[index].prod_created_date).format('YYYY-MM-DD') : moment(result[index].prod_updated_date).format('YYYY-MM-DD'),
 			prod_price: result[index].prod_price,
 			quantity: result[index].quantity
 		}
@@ -305,8 +305,8 @@ router.post('/list-suggestion', productValidation.listSuggestion, async (req, re
 			prod_category_id: result[index].prod_category_id,
 			prod_amount: result[index].prod_amount,
 			prod_description: result[index].prod_description,
-			prod_created_date: moment(result[index].prod_created_date).format('DD/MM/YYYY'),
-			prod_updated_date: moment(result[index].prod_updated_date).format('DD/MM/YYYY') == 'Invalid date' ? moment(result[index].prod_created_date).format('DD/MM/YYYY') : moment(result[index].prod_updated_date).format('DD/MM/YYYY'),
+			prod_created_date: moment(result[index].prod_created_date).format('YYYY-MM-DD'),
+			prod_updated_date: moment(result[index].prod_updated_date).format('YYYY-MM-DD') == 'Invalid date' ? moment(result[index].prod_created_date).format('YYYY-MM-DD') : moment(result[index].prod_updated_date).format('YYYY-MM-DD'),
 			prod_price: result[index].prod_price,
 			avgStar: result[index].avgstar
 		}
@@ -384,8 +384,8 @@ router.post('/list-by-cat', productValidation.listByCategory, async (req, res) =
 			prod_category_id: result[index].prod_category_id,
 			prod_amount: result[index].prod_amount,
 			prod_description: result[index].prod_description,
-			prod_created_date: moment(result[index].prod_created_date).format('DD/MM/YYYY'),
-			prod_updated_date: moment(result[index].prod_updated_date).format('DD/MM/YYYY') == 'Invalid date' ? moment(result[index].prod_created_date).format('DD/MM/YYYY') : moment(result[index].prod_updated_date).format('DD/MM/YYYY'),
+			prod_created_date: moment(result[index].prod_created_date).format('YYYY-MM-DD'),
+			prod_updated_date: moment(result[index].prod_updated_date).format('YYYY-MM-DD') == 'Invalid date' ? moment(result[index].prod_created_date).format('YYYY-MM-DD') : moment(result[index].prod_updated_date).format('YYYY-MM-DD'),
 			prod_price: result[index].prod_price,
 		}
 		let imageLink = result[index].prod_img_data
@@ -498,8 +498,8 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 			prod_category_id: result[index].prod_category_id,
 			prod_amount: result[index].prod_amount,
 			prod_description: result[index].prod_description,
-			prod_created_date: moment(result[index].prod_created_date).format('DD/MM/YYYY'),
-			prod_updated_date: moment(result[index].prod_updated_date).format('DD/MM/YYYY') == 'Invalid date' ? moment(result[index].prod_created_date).format('DD/MM/YYYY') : moment(result[index].prod_updated_date).format('DD/MM/YYYY'),
+			prod_created_date: moment(result[index].prod_created_date).format('YYYY-MM-DD'),
+			prod_updated_date: moment(result[index].prod_updated_date).format('YYYY-MM-DD') == 'Invalid date' ? moment(result[index].prod_created_date).format('YYYY-MM-DD') : moment(result[index].prod_updated_date).format('YYYY-MM-DD'),
 			prod_price: result[index].prod_price,
 		}
 		let imageLink = result[index].prod_img_data

@@ -15,14 +15,6 @@ const findAll = async () => {
 
 const findFather = async () => {
     const info = await knex('tbl_categories')
-                    .distinctOn('cate_father')
-                    .whereNot({ cate_father: null })
-
-    return info
-}
-
-const findAllFather = async () => {
-    const info = await knex('tbl_categories')
                     .where({ cate_father: null })
 
     return info
@@ -35,10 +27,30 @@ const findChild = async (cateFather) => {
     return info
 }
 
+const create = async (cateInfo) => {
+    await knex('tbl_categories')
+        .insert(cateInfo)
+
+}
+
+const update = async (cateId, cateInfo) => {
+    await knex('tbl_categories')
+        .where({ cate_id: cateId })
+        .update(cateInfo)
+}
+
+const del = async (cateId) => {
+    await knex('tbl_categories')
+        .where({ cate_id: cateId })
+        .del()
+}
+
 module.exports = {
     findById,
     findFather,
-    findAllFather,
     findChild,
-    findAll
+    findAll,
+    create,
+    update,
+    del
 }

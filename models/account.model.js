@@ -48,7 +48,7 @@ const isValidRefreshToken = async (accId, refreshToken) => {
 	return true
 }
 
-const updateAccount = async (accId, accountObject) => {
+const update = async (accId, accountObject) => {
 	await knex('tbl_account').where('acc_id', accId).update(accountObject)
 }
 
@@ -59,6 +59,6 @@ module.exports = {
 	findActiveUser,
 	updateRefreshToken,
 	isValidRefreshToken,
-	updateAccount,
+	update,
 	accountStatus
 }

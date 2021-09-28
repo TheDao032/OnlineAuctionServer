@@ -19,9 +19,9 @@ const errorCode = 1
 const successCode = 0
 
 router.post('/login', authenticationValidate.login, (req, res) => {
-	const { accEmail, accPpassWord } = req.body
+	const { accEmail, accPassword } = req.body
 
-	authenticationService.authenticate(accEmail, accPpassWord, async (err, auth = null, user = null) => {
+	authenticationService.authenticate(accEmail, accPassword, async (err, auth = null, user = null) => {
 		if (err) {
 			res.status(500).json({
 				err,
@@ -51,7 +51,7 @@ router.post('/login', authenticationValidate.login, (req, res) => {
 })
 
 router.post('/register', authenticationValidate.register, async (req, res) => {
-	const { accPassWord, accEmail, accFullName, accPhoneNumber } = req.body
+	const { accPassword, accEmail, accFullName, accPhoneNumber } = req.body
 	
 
 	const checkExistEmail = await accountModel.findByEmail(accEmail)
@@ -67,7 +67,7 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 
 	await mailService.sendMail(mailOptions.registerOptions(accEmail, accEmail, token), req, res)
 
-	const hashPassword = bcrypt.hashSync(accPassWord, 3)
+	const hashPassword = bcrypt.hashSync(accPassword, 3)
 	const hashToken = bcrypt.hashSync(token, 3)
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -127,7 +127,7 @@ router.post('/verification-email', authenticationValidate.confirmToken, async (r
 	}
 	
 
-	await accountModel.updateAccount(accid, accountInfo)
+	await accountModel.update(accid, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -159,7 +159,7 @@ router.post('/forgot-password', authenticationValidate.forgotPassword, async (re
 		acc_updated_date: presentDate
 	}
 
-	await accountModel.updateAccount(result[0].acc_id, accountInfo)
+	await accountModel.update(result[0].acc_id, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode,
@@ -190,7 +190,7 @@ router.post('/new-password', authenticationValidate.newPassword, async (req, res
 		acc_updated_date: presentDate
 	}
 
-	await accountModel.updateAccount(accId, newAccountInfo)
+	await accountModel.update(accId, newAccountInfo)
 	
 	return res.status(200).json({
 		statusCode: successCode

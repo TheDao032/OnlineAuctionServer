@@ -7,13 +7,12 @@ const bcrypt = require('bcrypt')
 
 const accountModel = require('../models/account.model')
 const roleModel = require('../models/role.model')
-const deliveryModel = require('../models/delivery.model')
 const imageService = require('../services/imageService')
 
 const successCode = 0
 const errorCode = 1
 
-router.get('/list', accountValidation.listParamsInfo, async (req, res) => {
+router.get('/list', accountValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 
 	const allAccount = await accountModel.findAll()
@@ -143,7 +142,7 @@ router.post('/update', accountValidation.updateAccount, async (req, res) => {
 		acc_updated_date: presentDate
 	}
 
-	await accountModel.updateAccount(accIdFlag, accountInfo)
+	await accountModel.update(accIdFlag, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -193,7 +192,7 @@ router.post('/update-password', accountValidation.updateAccountPassword, async (
 		acc_updated_date: presentDate
 	}
 
-	await accountModel.updateAccount(accIdFlag, accountInfo)
+	await accountModel.update(accIdFlag, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -225,7 +224,7 @@ router.post('/delete', accountValidation.deleteAccount, async (req, res) => {
 		acc_updated_date: presentDate
 	}
 	
-	await accountModel.updateAccount(accId, accountInfo)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -265,7 +264,7 @@ router.post('/update-role', accountValidation.updateRoleAccount, async (req, res
 		acc_updated_date: presentDate
 	}
 
-	await accountModel.updateAccount(accId, accountInfo)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -303,7 +302,7 @@ router.post('/update-avatar', accountValidation.avatar, async (req, res) => {
 			acc_updated_date: presentDate
 		}
 
-		await accountModel.updateAccount(accIdFlag, accountInfo)
+		await accountModel.update(accIdFlag, accountInfo)
 		
 		return res.status(200).json({
 			statusCode: successCode
@@ -333,7 +332,7 @@ router.post('/delete-avatar', accountValidation.avatar, async (req, res) => {
 		acc_updated_date: presentDate
 	}
 
-	await accountModel.updateAccount(accId, accountInfo)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -373,7 +372,7 @@ router.post('/update-status', accountValidation.updateStatusAccount, async (req,
 		acc_updated_date: presentDate
 	}
 
-	await accountModel.updateAccount(accId, accountInfo)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode

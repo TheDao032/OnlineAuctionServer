@@ -24,14 +24,14 @@ router.post('/add-father', categoriesValidation.newCategoryFather, async (req, r
 		})
 	}
 
-	const presentDate = moment().format("DD/MM/YYYY HH:mm:ss")
+	const presentDate = moment().format("YYYY-MM-DD HH:mm:ss")
 	const newFatherCate = {
 		cate_name: cateName,
 		cate_created_date: presentDate,
 		cate_updated_date: presentDate
 	}
 
-	await knex('tbl_categories').insert(newFatherCate)
+	await categoriesModel.create(newFatherCate)
 
 	return res.status(200).json({
 		statusCode: successCode
@@ -56,7 +56,7 @@ router.post('/add-child', categoriesValidation.newCategoryChild, async (req, res
 
 	if (fatherInfo.length === 0) {
 		return res.status(400).json({
-			errorMessage: `Category Doesn't Exist`,
+			errorMessage: `Invalid Category Father Id`,
 			statusCode: errorCode
 		})
 	}
@@ -68,15 +68,15 @@ router.post('/add-child', categoriesValidation.newCategoryChild, async (req, res
 		})
 	}
 
-	const presentDate = moment().format("DD/MM/YYYY HH:mm:ss")
-	const newFatherCate = {
+	const presentDate = moment().format("YYYY-MM-DD HH:mm:ss")
+	const cateInfo = {
 		cate_name: cateName,
 		cate_father: cateFather,
 		cate_created_date: presentDate,
 		cate_updated_date: presentDate
 	}
 
-	await knex('tbl_categories').insert(newFatherCate)
+	await categoriesModel.create(cateInfo)
 	
 	return res.status(200).json({
 		statusCode: successCode
@@ -126,16 +126,14 @@ router.post('/update', categoriesValidation.updateCategory, async (req, res) => 
 		}
 	}
 
-	const presentDate = moment().format("DD/MM/YYYY HH:mm:ss")
-	const cateUpdate = {
+	const presentDate = moment().format("YYYY-MM-DD HH:mm:ss")
+	const cateInfo = {
 		cate_name: cateName,
 		cate_father: checkCateFather ? cateFather : result[0].cate_father,
 		cate_updated_date: presentDate
 	}
 
-	await knex('tbl_categories')
-		.where({ cate_id: cateId })
-		.update(cateUpdate)
+	await categoriesModel.update(cateId, cateInfo)
 	
 	return res.status(200).json({
 		statusCode: successCode
@@ -149,7 +147,7 @@ router.post('/delete', categoriesValidation.deleteCategory, async (req, res) => 
 
 	if (result.length === 0) {
 		res.status(400).json({
-			errorMessage: 'Catetegory Is Not Found',
+			errorMessage: 'Invalid Catetegory Id',
 			statusCode: errorCode
 		})
 	}
@@ -172,9 +170,7 @@ router.post('/delete', categoriesValidation.deleteCategory, async (req, res) => 
 		})
 	}
 
-	await knex('tbl_categories')
-		.where({ cate_id: cateId })
-		.del()
+	await categoriesModel.del(cateId)
 
 	return res.status(200).json({
 		statusCode: successCode
