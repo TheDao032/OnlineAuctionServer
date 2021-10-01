@@ -77,17 +77,27 @@ router.get('/list-father', categoriesValidation.paramsInfo, async (req, res) => 
 	const { page, limit } = req.query
 
 	const listCategoriesFather = await categoriesModel.findFather()
+
+	const result = listCategoriesFather.map((element) => {
+		return {
+			cateId: element.cate_id,
+			cateName: element.cate_name,
+			cateFather: element.cate_father,
+			createDate: element.cate_created_date,
+			updateDate: element.cate_updated_date
+		}
+	})
 	
 	if (page && limit) {
 		let startIndex = (parseInt(page) - 1) * parseInt(limit)
 		let endIndex = (parseInt(page) * parseInt(limit))
-		let totalPage = Math.floor(listCategoriesFather.length / parseInt(limit))
+		let totalPage = Math.floor(result.length / parseInt(limit))
 
-		if (listCategoriesFather.length % parseInt(limit) !== 0) {
+		if (result.length % parseInt(limit) !== 0) {
 			totalPage = totalPage + 1
 		}
 
-		const listFather = listCategoriesFather.slice(startIndex, endIndex)
+		const listFather = result.slice(startIndex, endIndex)
 
 		return res.status(200).json({
 			totalPage,
@@ -97,7 +107,7 @@ router.get('/list-father', categoriesValidation.paramsInfo, async (req, res) => 
 	}
 
 	return res.status(200).json({
-		listFather: listCategoriesFather,
+		listFather: result,
 		statusCode: successCode
 	})
 })

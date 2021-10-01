@@ -5,9 +5,9 @@
 -- Dumped from database version 13.4
 -- Dumped by pg_dump version 13.4
 
-SET statement_timestampout = 0;
-SET lock_timestampout = 0;
-SET idle_in_transaction_session_timestampout = 0;
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SELECT pg_catalog.set_config('search_path', '', false);
@@ -50,8 +50,8 @@ CREATE TABLE public.tbl_account (
     acc_status integer DEFAULT 2,
     acc_token_forgot character varying(100),
     acc_refresh_token character varying(100),
-    acc_created_date timestamp,
-    acc_updated_date timestamp
+    acc_created_date timestamp without time zone,
+    acc_updated_date timestamp without time zone
 );
 
 
@@ -79,8 +79,8 @@ CREATE TABLE public.tbl_cart (
     cart_id integer DEFAULT nextval('public.tbl_cart_id_seq'::regclass) NOT NULL,
     cart_acc_id integer,
     cart_prod_id integer,
-    cart_created_date timestamp,
-    cart_updated_date timestamp
+    cart_created_date timestamp without time zone,
+    cart_updated_date timestamp without time zone
 );
 
 
@@ -108,8 +108,8 @@ CREATE TABLE public.tbl_categories (
     cate_id integer DEFAULT nextval('public.tbl_categories_id_seq'::regclass) NOT NULL,
     cate_name character varying(100),
     cate_father integer,
-    cate_created_date timestamp,
-    cate_updated_date timestamp
+    cate_created_date timestamp without time zone,
+    cate_updated_date timestamp without time zone
 );
 
 
@@ -139,8 +139,8 @@ CREATE TABLE public.tbl_comment (
     cmt_content text,
     cmt_acc_id integer NOT NULL,
     cmt_owner_id integer NOT NULL,
-    cmt_created_date timestamp,
-    cmt_updated_date timestamp
+    cmt_created_date timestamp without time zone,
+    cmt_updated_date timestamp without time zone
 );
 
 
@@ -169,8 +169,8 @@ CREATE TABLE public.tbl_product (
     prod_name character varying(60),
     prod_cate_id integer,
     prod_price double precision,
-    prod_created_date timestamp,
-    prod_updated_date timestamp,
+    prod_created_date timestamp without time zone,
+    prod_updated_date timestamp without time zone,
     ts tsvector GENERATED ALWAYS AS (setweight(to_tsvector('english'::regconfig, (COALESCE(prod_name, ''::character varying))::text), 'A'::"char")) STORED
 );
 
@@ -199,8 +199,8 @@ CREATE TABLE public.tbl_product_description (
     prod_desc_id integer DEFAULT nextval('public.tbl_product_description_id_seq'::regclass) NOT NULL,
     prod_desc_prod_id integer,
     prod_desc_content text,
-    prod_desc_created_date timestamp,
-    prod_desc_updated_date timestamp
+    prod_desc_created_date timestamp without time zone,
+    prod_desc_updated_date timestamp without time zone
 );
 
 
@@ -240,28 +240,19 @@ ALTER TABLE public.tbl_product_images OWNER TO postgres;
 CREATE TABLE public.tbl_roles (
     rol_id character varying(5) NOT NULL,
     rol_name character varying(5),
-    rol_created_date timestamp,
-    rol_updated_date timestamp
+    rol_created_date timestamp without time zone,
+    rol_updated_date timestamp without time zone
 );
 
 
 ALTER TABLE public.tbl_roles OWNER TO postgres;
 
 --
--- Data for Name: tbl_roles; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY public.tbl_roles (rol_id, rol_name, rol_created_date, rol_updated_date) FROM stdin;
-ADM	Admin	2021-09-16	2021-09-16
-USER	User	2021-09-16	2021-09-16
-\.
-
---
 -- Data for Name: tbl_account; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.tbl_account (acc_id, acc_password, acc_token, acc_email, acc_phone_number, acc_full_name, acc_role, acc_avatar, acc_status, acc_token_forgot, acc_refresh_token, acc_created_date, acc_updated_date) FROM stdin;
-2	$2b$04$RKApZStqzmlWnaJ4iIQT1OqNKWm1da4Bxv63HV8PXroLJMkaRHRy2	\N	nthedao2705@gmail.com	\N	\N	ADM	\N	0	\N	rOcH9drBkKHYiM1bzTEBJRIJ1AYTcrLcPqWZwDV30YcvtvLvAWht5pggR0s4Qq5kkt2vakPUqlf7NBG5mDBEMgtSuYSoVE9EJRKd	2021-09-16	2021-09-16
+2	$2b$04$RKApZStqzmlWnaJ4iIQT1OqNKWm1da4Bxv63HV8PXroLJMkaRHRy2	\N	nthedao2705@gmail.com	\N	\N	ADM	\N	0	\N	3Svbk2GE2C04o5QU4ln6Iq2BjwK2TzXDZ7ydzUqDfGBap94qaAUT5IpLEC8YYIIy8rNSg7uUiDWWHrbslx1tMaH5H804G5awDVBN	2021-09-16 00:00:00	2021-09-16 00:00:00
 \.
 
 
@@ -278,6 +269,12 @@ COPY public.tbl_cart (cart_id, cart_acc_id, cart_prod_id, cart_created_date, car
 --
 
 COPY public.tbl_categories (cate_id, cate_name, cate_father, cate_created_date, cate_updated_date) FROM stdin;
+1	Điện Tử	\N	2021-09-16 23:44:23	2021-09-16 23:44:23
+2	Đồ Gia Dụng	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
+3	Máy Tính	1	2021-09-27 23:44:23	2021-09-27 23:44:23
+4	TV	2	2021-09-27 23:44:23	2021-09-27 23:44:23
+5	Tác Phẩm Nghệ Thuật	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
+6	Đá Quý	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
 \.
 
 
@@ -312,6 +309,17 @@ COPY public.tbl_product_description (prod_desc_id, prod_desc_prod_id, prod_desc_
 COPY public.tbl_product_images (prod_img_id, prod_img_product_id, prod_img_data) FROM stdin;
 \.
 
+
+--
+-- Data for Name: tbl_roles; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.tbl_roles (rol_id, rol_name, rol_created_date, rol_updated_date) FROM stdin;
+ADM	Admin	2021-09-16 00:00:00	2021-09-16 00:00:00
+USER	User	2021-09-16 00:00:00	2021-09-16 00:00:00
+\.
+
+
 --
 -- Name: tbl_account_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
@@ -330,7 +338,7 @@ SELECT pg_catalog.setval('public.tbl_cart_id_seq', 1, false);
 -- Name: tbl_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tbl_categories_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tbl_categories_id_seq', 7, true);
 
 
 --
