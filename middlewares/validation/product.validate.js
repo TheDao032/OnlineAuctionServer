@@ -8,10 +8,12 @@ const newProduct = (req, res, next) => {
 		properties: {
 			prodName: { type: 'string', maxLength: 60 },
 			prodCateId: { type: 'string', pattern: '^\\d+$' },
-			prodPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
+			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
+			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
+			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodDescription: { type: 'string' },
 		},
-		required: ['prodName', 'prodCateId', 'prodPrice'],
+		required: ['prodName', 'prodCateId', 'prodStepPrice'],
 		additionalProperties: true
 	}
 
@@ -63,21 +65,15 @@ const updateProduct = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
+			prodId: { type: 'integer' },
 			prodName: { type: 'string', maxLength: 60 },
 			prodCateId: { type: 'string', pattern: '^\\d+$' },
-			prodPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
+			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
+			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
+			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodDescription: { type: 'string' },
 		},
-		required: [],
-		additionalProperties: true
-	}
-
-	const shemaParams = {
-		type: 'object',
-		properties: {
-			id: { type: 'integer' },
-		},
-		required: ['id'],
+		required: ['prodId'],
 		additionalProperties: true
 	}
 
@@ -88,17 +84,7 @@ const updateProduct = (req, res, next) => {
 	const validatorBody = ajv.compile(shemaBody)
 	const validBody = validatorBody(req.body)
 
-	const validatorParams = ajv.compile(shemaParams)
-	const validParams = validatorParams(req.params)
-
 	if (!validBody) {
-		return res.status(400).json({
-			errorMessage: validParams.errors[0].message,
-			statusCode: errorCode
-		})
-	}
-
-	if (!validParams) {
 		return res.status(400).json({
 			errorMessage: validParams.errors[0].message,
 			statusCode: errorCode

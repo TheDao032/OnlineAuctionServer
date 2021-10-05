@@ -33,7 +33,7 @@ router.get('/list', accountValidation.queryInfo, async (req, res) => {
 	if (result) {
 		result.sort((a, b) => a - b)
 
-		if (page || limit) {
+		if (page && limit) {
 			let startIndex = (parseInt(page) - 1) * parseInt(limit)
 			let endIndex = (parseInt(page) * parseInt(limit))
 			let totalPage = Math.floor(result[0].length / parseInt(limit))

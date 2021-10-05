@@ -13,7 +13,6 @@ const mailService = require('../services/mailService')
 const mailOptions = require('../template/mailOptions')
 
 const accountModel = require('../models/account.model')
-const roleModel = require('../models/role.model')
 
 const errorCode = 1
 const successCode = 0
@@ -77,7 +76,7 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 		acc_email: accEmail,
 		acc_phone_number: accPhoneNumber || null,
 		acc_full_name: accFullName || null,
-		acc_role: 'USER',
+		acc_role: 'BIDDER',
 		acc_token: hashToken,
 		acc_created_date: presentDate
 	}

@@ -16,7 +16,6 @@ router.get('/list', categoriesValidation.paramsInfo, async (req, res) => {
 	const allCategories = await categoriesModel.findAll()
 	const listCategoriesFather = await categoriesModel.findFather()
 
-	
 	const result = await Promise.all([
 		listCategoriesFather.map((item) => {
 			const listChild = allCategories.filter((info) => info.cate_father === item.cate_id)

@@ -166,10 +166,14 @@ ALTER TABLE public.tbl_product_id_seq OWNER TO postgres;
 
 CREATE TABLE public.tbl_product (
     prod_id integer DEFAULT nextval('public.tbl_product_id_seq'::regclass) NOT NULL,
-    prod_name character varying(60),
+    prod_name character varying(100),
     prod_cate_id integer,
-    prod_price double precision,
+    prod_offer_number integer,
+    prod_begin_price double precision,
+    prod_step_price double precision,
+    prod_buy_price double precision,
     prod_created_date timestamp without time zone,
+    prod_expired_date timestamp without time zone,
     prod_updated_date timestamp without time zone,
     ts tsvector GENERATED ALWAYS AS (setweight(to_tsvector('english'::regconfig, (COALESCE(prod_name, ''::character varying))::text), 'A'::"char")) STORED
 );
@@ -239,7 +243,7 @@ ALTER TABLE public.tbl_product_images OWNER TO postgres;
 
 CREATE TABLE public.tbl_roles (
     rol_id character varying(5) NOT NULL,
-    rol_name character varying(5),
+    rol_name character varying(100),
     rol_created_date timestamp without time zone,
     rol_updated_date timestamp without time zone
 );
@@ -252,7 +256,7 @@ ALTER TABLE public.tbl_roles OWNER TO postgres;
 --
 
 COPY public.tbl_account (acc_id, acc_password, acc_token, acc_email, acc_phone_number, acc_full_name, acc_role, acc_avatar, acc_status, acc_token_forgot, acc_refresh_token, acc_created_date, acc_updated_date) FROM stdin;
-2	$2b$04$RKApZStqzmlWnaJ4iIQT1OqNKWm1da4Bxv63HV8PXroLJMkaRHRy2	\N	nthedao2705@gmail.com	\N	\N	ADM	\N	0	\N	3Svbk2GE2C04o5QU4ln6Iq2BjwK2TzXDZ7ydzUqDfGBap94qaAUT5IpLEC8YYIIy8rNSg7uUiDWWHrbslx1tMaH5H804G5awDVBN	2021-09-16 00:00:00	2021-09-16 00:00:00
+2	$2b$04$RKApZStqzmlWnaJ4iIQT1OqNKWm1da4Bxv63HV8PXroLJMkaRHRy2	\N	nthedao2705@gmail.com	\N	\N	ADM	\N	0	\N	SnYrumGUblA8rjxDUtPxJFSgUZqUbIv6PkZ6DT5pPXEIZKfnaPrCF4dg2AQU2ZgKvTJTqKbGRij00K2IwOU79HJU9K1qgvv0C1fT	2021-09-16 00:00:00	2021-09-16 00:00:00
 \.
 
 
@@ -272,9 +276,15 @@ COPY public.tbl_categories (cate_id, cate_name, cate_father, cate_created_date, 
 1	Điện Tử	\N	2021-09-16 23:44:23	2021-09-16 23:44:23
 2	Đồ Gia Dụng	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
 3	Máy Tính	1	2021-09-27 23:44:23	2021-09-27 23:44:23
-4	TV	2	2021-09-27 23:44:23	2021-09-27 23:44:23
 5	Tác Phẩm Nghệ Thuật	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
 6	Đá Quý	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
+4	TV	1	2021-09-27 23:44:23	2021-09-27 23:44:23
+9	Bộ Dụng Cụ Làm Bếp	2	2021-10-04 18:13:47	2021-10-04 18:13:47
+10	Tủ Đựng Đồ Gia Dụng	2	2021-10-04 18:52:26	2021-10-04 18:52:26
+11	Tranh Ảnh	5	2021-10-04 18:53:55	2021-10-04 18:53:55
+12	Tượng	5	2021-10-04 18:55:29	2021-10-04 18:55:29
+13	Kim Cương	6	2021-10-04 18:56:37	2021-10-04 18:56:37
+14	Hồng Ngọc	6	2021-10-04 18:57:06	2021-10-04 18:57:06
 \.
 
 
@@ -290,7 +300,7 @@ COPY public.tbl_comment (cmt_id, cmt_grade, cmt_content, cmt_acc_id, cmt_owner_i
 -- Data for Name: tbl_product; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tbl_product (prod_id, prod_name, prod_cate_id, prod_price, prod_created_date, prod_updated_date) FROM stdin;
+COPY public.tbl_product (prod_id, prod_name, prod_cate_id, prod_offer_number, prod_begin_price, prod_step_price, prod_buy_price, prod_created_date, prod_expired_date, prod_updated_date) FROM stdin;
 \.
 
 
@@ -315,8 +325,9 @@ COPY public.tbl_product_images (prod_img_id, prod_img_product_id, prod_img_data)
 --
 
 COPY public.tbl_roles (rol_id, rol_name, rol_created_date, rol_updated_date) FROM stdin;
-ADM	Admin	2021-09-16 00:00:00	2021-09-16 00:00:00
-USER	User	2021-09-16 00:00:00	2021-09-16 00:00:00
+ADM	Admin	2021-10-04 17:47:47.623473	2021-10-04 17:47:47.623473
+SEL	Seller	2021-10-04 17:48:49.828857	2021-10-04 17:48:49.828857
+BID	Bidder	2021-10-04 18:59:18.144391	2021-10-04 18:59:18.144391
 \.
 
 
@@ -338,7 +349,7 @@ SELECT pg_catalog.setval('public.tbl_cart_id_seq', 1, false);
 -- Name: tbl_categories_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tbl_categories_id_seq', 7, true);
+SELECT pg_catalog.setval('public.tbl_categories_id_seq', 14, true);
 
 
 --

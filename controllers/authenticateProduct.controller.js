@@ -17,29 +17,37 @@ const errorCode = 1
 
 router.post('/add', productValidation.newProduct, async (req, res) => {
 
-	const { prodName, prodCateId, prodPrice, prodDescription } = req.body
+	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription } = req.body
 	const prodImage = req.files
 
 	let checkProdImage = false
 	if (prodImage) {
-		checkProdImage = prodIm
-		age.image ? true : false
+		checkProdImage = prodImage.image ? true : false
 	}
 
-	if (parseFLoat(prodPrice) < 0) {
+	if (parseFLoat(prodStepPrice) < 0 ) {
 		return res.status(400).json({
-			errorMessage: `Product Price Can't Smaller Than 0`,
+			errorMessage: `Product Step Price Can't Smaller Than 0`,
 			statusCode: errorCode
 		})
 	}
 
+	if (prodBuyPrice) {
+		if (parseFLoat(prodBuyPrice) < 1) {
+			return res.status(400).json({
+				errorMessage: `Product Buy Price Can't Smaller Than 1`,
+				statusCode: errorCode
+			})
+		}
+	}
+	
 	const listProdInfo = await productModel.findAll()
 
 	const checkExistProd = listProdInfo.find((item) => (item.prod_name.toLowerCase() === prodName.toLowerCase()) && (item.prod_cate_id === prodCateId))
 
 	if (checkExistProd) {
 		return res.status(400).json({
-			errorMessage: `Product Has Already Existed`,
+			errorMessage: `Product's Name Has Already Existed`,
 			statusCode: errorCode
 		})
 	}
@@ -85,11 +93,16 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
+	const expireDate = moment(new Date(moment().year(), moment().month(), moment().date() + 1, moment().hour(), moment().minute(), moment().second())).format('YYYY-MM-DD HH:mm:ss')
+
 	const newProd = {
 		prod_name: prodName,
 		prod_cate_id: prodCateId,
-		prod_price: parseFloat(prodPrice),
+		prod_begin_price: prodBeginPrice && parseFloat(prodBeginPrice) > 0 ? parseFloat(prodBeginPrice) : 0,
+		prod_step_price: parseFloat(prodStepPrice),
+		prod_buy_price: parseFloat(prodBuyPrice),
 		prod_created_date: presentDate,
+		prod_expired_date: expireDate,
 		prod_updated_date: presentDate
 	}
 
@@ -117,9 +130,8 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 
 })
 
-router.post('/update/:id', productValidation.updateProduct, async (req, res) => {
-	const { prodName, prodCateId, prodPrice, prodDescription } = req.body
-	const { id } = req.params
+router.post('/update', productValidation.updateProduct, async (req, res) => {
+	const { prodId, prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription } = req.body
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 	let updateProd = {}
@@ -128,7 +140,7 @@ router.post('/update/:id', productValidation.updateProduct, async (req, res) => 
 
 	const listProducts = await productModel.findAll()
 
-	const checkExistProd = await productModel.findById(id)
+	const checkExistProd = await productModel.findById(prodId)
 
 	if (checkExistProd.length === 0) {
 		return res.status(400).json({
@@ -138,7 +150,7 @@ router.post('/update/:id', productValidation.updateProduct, async (req, res) => 
 	}
 
 	if (prodName && prodName !== '') {
-		const checkExistProdName = listProducts.find((item) => (item.prod_name.toLowerCase() === prodName.toLowerCase()) && (item.prod_id !== id))
+		const checkExistProdName = listProducts.find((item) => (item.prod_name.toLowerCase() === prodName.toLowerCase()) && (item.prod_id !== prodId))
 
 		if (checkExistProdName) {
 			return res.status(400).json({
@@ -152,7 +164,41 @@ router.post('/update/:id', productValidation.updateProduct, async (req, res) => 
 		updateProd.prod_name = checkExistProd[0].prod_name
 	}
 
-	
+	if (prodBeginPrice) {
+		if (parseFLoat(prodBeginPrice) < 0) {
+			return res.status(400).json({
+				errorMessage: `Product Begin Price Can't Smaller Than 0`,
+				statusCode: errorCode
+			})
+		}
+		updateProd.prod_begin_price = prodBeginPrice
+	} else {
+		updateProd.prod_begin_price = checkExistProd[0].prod_begin_price
+	}
+
+	if (prodStepPrice) {
+		if (parseFLoat(prodStepPrice) < 1) {
+			return res.status(400).json({
+				errorMessage: `Product Step Price Can't Smaller Than 1`,
+				statusCode: errorCode
+			})
+		}
+		updateProd.prod_step_price = prodStepPrice
+	} else {
+		updateProd.prod_step_price = checkExistProd[0].prod_step_price
+	}
+
+	if (prodBuyPrice) {
+		if (parseFLoat(prodBuyPrice) < 1) {
+			return res.status(400).json({
+				errorMessage: `Product Buy Price Can't Smaller Than 1`,
+				statusCode: errorCode
+			})
+		}
+		updateProd.prod_buy_price = prodBuyPrice
+	} else {
+		updateProd.prod_buy_price = checkExistProd[0].prod_buy_price
+	}
 
 	if (prodCateId) {
 		const cateInfo = await categoriesModel.findById(prodCateId)
@@ -169,22 +215,9 @@ router.post('/update/:id', productValidation.updateProduct, async (req, res) => 
 		updateProd.prod_cate_id = checkExistProd[0].prod_cate_id
 	}
 
-	if (prodPrice) {
-		if (parseFloat(prodPrice) < 0) {
-			return res.status(400).json({
-				errorMessage: `Product's Price Can't Be Smaller Than 0`,
-				statusCode: errorCode
-			})
-		}
-
-		updateProd.prod_price = parseFloat(prodPrice)
-	} else {
-		updateProd.prod_price = checkExistProd0[0].prod_price
-	}
-
 	if (prodDescription && prodDescription !== '') {
 		const updateProdDescription = {
-			prod_desc_prod_id: id,
+			prod_desc_prod_id: prodId,
 			prod_desc_content: prodDescription,
 			prod_desc_created_date: presentDate,
 			prod_desc_updated_date: presentDate
@@ -194,7 +227,7 @@ router.post('/update/:id', productValidation.updateProduct, async (req, res) => 
 	}
 
 	
-	await productModel.update(updateProd, id)
+	await productModel.update(updateProd, prodId)
 
 	return res.status(200).json({
 		statusCode: successCode

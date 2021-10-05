@@ -44,31 +44,14 @@ const newCategoryChild = (req, res, next) => {
 		allErrors: true
 	})
 
-	const shemaQuery = {
-		type: 'object',
-		properties: {
-		  id: { type: 'string', pattern: '^\\d+$' }
-		},
-	  required: ['id'],
-	  additionalProperties: true
-  	}
 
 	const validatorBody = ajv.compile(shemaBody)
 	const validBody = validatorBody(req.body)
 
-	const validatorQuery = ajv.compile(shemaQuery)
-	const validQuery = validatorQuery = ajv.compile(shemaQuery)
 
 	if (!validBody) {
 		return res.status(400).json({
 			errorMessage: validBody.errors[0].message,
-			statusCode: errorCode
-		})
-	}
-
-	if (!validQuery) {
-		return res.status(400).json({
-			errorMessage: validQuery.errors[0].message,
 			statusCode: errorCode
 		})
 	}

@@ -61,7 +61,7 @@ router.post('/add-child', categoriesValidation.newCategoryChild, async (req, res
 		})
 	}
 
-	if (fatherInfo[0].cateFather !== null) {
+	if (fatherInfo[0].cate_father !== null) {
 		return res.status(400).json({
 			errorMessage: `Can't Set Sub-Category To Be Category Father`,
 			statusCode: errorCode
