@@ -186,7 +186,7 @@ router.get('/list-time-out', async (req, res) => {
 		}
 		
 		return false
-	})
+	}).sort((a, b) => a.prod_expired_date - b.prod_expired_date)
 
 	const result = listFilter.map((element) => {
 		return {
@@ -197,10 +197,61 @@ router.get('/list-time-out', async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
-			createDate: element.prod_created_date,
-			expireDate: element.prod_expired_date
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
+	}).slice(0, 5)
+
+	return res.status(200).json({
+		listTimeOut: result,
+		statusCode: successCode
 	})
+})
+
+router.get('/list-biggest-offer', async (req, res) => {
+	const allProduct = await productModel.findAll()
+
+	const listFilter = allProduct.sort((a, b) => b.prod_offer_number - a.prod_offer_number)
+
+	const result = listFilter.map((element) => {
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+		}
+	}).slice(0, 5)
+
+	return res.status(200).json({
+		listTimeOut: result,
+		statusCode: successCode
+	})
+})
+
+router.get('/list-biggest-price', async (req, res) => {
+	const allProduct = await productModel.findAll()
+
+	const listFilter = allProduct.sort((a, b) => b.prod_begin_price - a.prod_begin_price)
+
+	const result = listFilter.map((element) => {
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+		}
+	}).slice(0, 5)
+
 	return res.status(200).json({
 		listTimeOut: result,
 		statusCode: successCode
