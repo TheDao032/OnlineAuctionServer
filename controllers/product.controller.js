@@ -228,7 +228,7 @@ router.get('/list-biggest-offer', async (req, res) => {
 	}).slice(0, 5)
 
 	return res.status(200).json({
-		listTimeOut: result,
+		listBiggestOffer: result,
 		statusCode: successCode
 	})
 })
@@ -253,7 +253,7 @@ router.get('/list-biggest-price', async (req, res) => {
 	}).slice(0, 5)
 
 	return res.status(200).json({
-		listTimeOut: result,
+		listBiggestPrice: result,
 		statusCode: successCode
 	})
 })

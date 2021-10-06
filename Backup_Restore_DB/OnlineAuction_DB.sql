@@ -256,7 +256,7 @@ ALTER TABLE public.tbl_roles OWNER TO postgres;
 --
 
 COPY public.tbl_account (acc_id, acc_password, acc_token, acc_email, acc_phone_number, acc_full_name, acc_role, acc_avatar, acc_status, acc_token_forgot, acc_refresh_token, acc_created_date, acc_updated_date) FROM stdin;
-2	$2b$04$RKApZStqzmlWnaJ4iIQT1OqNKWm1da4Bxv63HV8PXroLJMkaRHRy2	\N	nthedao2705@gmail.com	\N	\N	ADM	\N	0	\N	SnYrumGUblA8rjxDUtPxJFSgUZqUbIv6PkZ6DT5pPXEIZKfnaPrCF4dg2AQU2ZgKvTJTqKbGRij00K2IwOU79HJU9K1qgvv0C1fT	2021-09-16 00:00:00	2021-09-16 00:00:00
+2	$2b$04$RKApZStqzmlWnaJ4iIQT1OqNKWm1da4Bxv63HV8PXroLJMkaRHRy2	\N	nthedao2705@gmail.com	\N	\N	ADM	\N	0	\N	AIZiDHRJQrsc6yPV2aBjxJruU6BjrBhiXEMLOSYAsFFzyA6m8g5mJj14IGSHxhrculyAziU2XkSRpyPNvipYDYQunhYKCTKCSAQM	2021-09-16 00:00:00	2021-09-16 00:00:00
 \.
 
 
@@ -274,17 +274,17 @@ COPY public.tbl_cart (cart_id, cart_acc_id, cart_prod_id, cart_created_date, car
 
 COPY public.tbl_categories (cate_id, cate_name, cate_father, cate_created_date, cate_updated_date) FROM stdin;
 1	Điện Tử	\N	2021-09-16 23:44:23	2021-09-16 23:44:23
-2	Đồ Gia Dụng	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
 3	Máy Tính	1	2021-09-27 23:44:23	2021-09-27 23:44:23
 5	Tác Phẩm Nghệ Thuật	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
 6	Đá Quý	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
 4	TV	1	2021-09-27 23:44:23	2021-09-27 23:44:23
-9	Bộ Dụng Cụ Làm Bếp	2	2021-10-04 18:13:47	2021-10-04 18:13:47
-10	Tủ Đựng Đồ Gia Dụng	2	2021-10-04 18:52:26	2021-10-04 18:52:26
 11	Tranh Ảnh	5	2021-10-04 18:53:55	2021-10-04 18:53:55
 12	Tượng	5	2021-10-04 18:55:29	2021-10-04 18:55:29
 13	Kim Cương	6	2021-10-04 18:56:37	2021-10-04 18:56:37
 14	Hồng Ngọc	6	2021-10-04 18:57:06	2021-10-04 18:57:06
+2	Đồ Cổ	\N	2021-09-27 23:44:23	2021-09-27 23:44:23
+9	Gốm Sứ	2	2021-10-04 18:13:47	2021-10-04 18:13:47
+10	Tượng Cổ	2	2021-10-04 18:52:26	2021-10-04 18:52:26
 \.
 
 
@@ -301,6 +301,14 @@ COPY public.tbl_comment (cmt_id, cmt_grade, cmt_content, cmt_acc_id, cmt_owner_i
 --
 
 COPY public.tbl_product (prod_id, prod_name, prod_cate_id, prod_offer_number, prod_begin_price, prod_step_price, prod_buy_price, prod_created_date, prod_expired_date, prod_updated_date) FROM stdin;
+3	Samsung Smart TV QLED QA55Q65A	4	4	1000.25	100	100000000	2021-10-05 22:56:07	2021-10-08 00:50:07	2021-10-05 22:56:07
+1	MacBook Air	3	1	1000.25	100	100000000	2021-10-05 22:48:33	2021-10-06 22:48:33	2021-10-05 22:48:33
+2	MacBook Pro	3	3	2000.5	100	100000000	2021-10-05 22:54:25	2021-10-06 22:54:25	2021-10-05 22:54:25
+5	Mona Lisa	11	8	1000.25	100	100000000	2021-10-05 22:59:58	2021-10-06 20:59:58	2021-10-05 22:59:58
+6	The Last Supper	4	19	95131351	100	100000000	2021-10-05 23:00:12	2021-10-06 20:00:12	2021-10-05 23:00:12
+7	Tượng David	12	10	8888	100	100000000	2021-10-05 23:04:20	2021-10-06 20:14:20	2021-10-05 22:48:33
+8	Tượng Venus	12	5	10000000	100	100000000	2021-10-05 23:06:20	2021-10-06 20:14:20	2021-10-06 01:06:20
+4	LG Smart TV 55UP7550PTC	4	6	4000	100	100000000	2021-10-05 22:56:21	2021-10-06 21:49:21	2021-10-05 22:56:21
 \.
 
 
@@ -309,6 +317,14 @@ COPY public.tbl_product (prod_id, prod_name, prod_cate_id, prod_offer_number, pr
 --
 
 COPY public.tbl_product_description (prod_desc_id, prod_desc_prod_id, prod_desc_content, prod_desc_created_date, prod_desc_updated_date) FROM stdin;
+1	\N		2021-10-05 22:48:33	2021-10-05 22:48:33
+2	\N		2021-10-05 22:54:25	2021-10-05 22:54:25
+3	\N		2021-10-05 22:56:07	2021-10-05 22:56:07
+4	\N		2021-10-05 22:56:21	2021-10-05 22:56:21
+5	\N		2021-10-05 22:59:58	2021-10-05 22:59:58
+6	\N		2021-10-05 23:00:12	2021-10-05 23:00:12
+7	\N		2021-10-05 23:04:20	2021-10-05 23:04:20
+8	\N		2021-10-05 23:06:20	2021-10-05 23:06:20
 \.
 
 
@@ -363,14 +379,14 @@ SELECT pg_catalog.setval('public.tbl_comment_id_seq', 1, false);
 -- Name: tbl_product_description_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tbl_product_description_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tbl_product_description_id_seq', 8, true);
 
 
 --
 -- Name: tbl_product_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tbl_product_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tbl_product_id_seq', 8, true);
 
 
 --
