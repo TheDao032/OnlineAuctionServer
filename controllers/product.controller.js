@@ -174,7 +174,38 @@ router.post('/list', productValidation.paramsInfo, async (req, res) => {
 	// }
 })
 
-router.post('/list')
+router.get('/list-time-out', async (req, res) => {
+	const allProduct = await productModel.findAll()
+
+	const listFilter = allProduct.filter((item) => {
+
+		const productExpire = moment(new Date(item.prod_expired_date))
+
+		if (moment().year() === productExpire.year() && moment().month() === productExpire.month() && moment().date() === productExpire.date() && (moment().hour() + 1) === productExpire.hour()) {
+			return true
+		}
+		
+		return false
+	})
+
+	const result = listFilter.map((element) => {
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			createDate: element.prod_created_date,
+			expireDate: element.prod_expired_date
+		}
+	})
+	return res.status(200).json({
+		listTimeOut: result,
+		statusCode: successCode
+	})
+})
 
 // router.post('/list-best-sale', productValidation.listBestSale, async (req, res) => {
 // 	const { limit, page } = req.body

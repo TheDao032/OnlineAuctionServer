@@ -25,7 +25,9 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 		checkProdImage = prodImage.image ? true : false
 	}
 
-	if (parseFLoat(prodStepPrice) < 0 ) {
+	const convertStep = parseFloat(prodStepPrice)
+
+	if (convertStep < 0 ) {
 		return res.status(400).json({
 			errorMessage: `Product Step Price Can't Smaller Than 0`,
 			statusCode: errorCode
@@ -33,7 +35,8 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 	}
 
 	if (prodBuyPrice) {
-		if (parseFLoat(prodBuyPrice) < 1) {
+		const convertBuy = parseFloat(prodBuyPrice)
+		if (convertBuy < 1) {
 			return res.status(400).json({
 				errorMessage: `Product Buy Price Can't Smaller Than 1`,
 				statusCode: errorCode
@@ -57,6 +60,13 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 	if (cateInfo.length === 0) {
 		return res.status(400).json({
 			errorMessage: `Category Is Invalid`,
+			statusCode: errorCode
+		})
+	}
+
+	if (cateInfo[0].cate_father === null) {
+		return res.status(400).json({
+			errorMessage: `Not Sub Categories`,
 			statusCode: errorCode
 		})
 	}
@@ -95,12 +105,14 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 
 	const expireDate = moment(new Date(moment().year(), moment().month(), moment().date() + 1, moment().hour(), moment().minute(), moment().second())).format('YYYY-MM-DD HH:mm:ss')
 
+	const convertBegin = parseFloat(prodBeginPrice)
+
 	const newProd = {
 		prod_name: prodName,
 		prod_cate_id: prodCateId,
-		prod_begin_price: prodBeginPrice && parseFloat(prodBeginPrice) > 0 ? parseFloat(prodBeginPrice) : 0,
-		prod_step_price: parseFloat(prodStepPrice),
-		prod_buy_price: parseFloat(prodBuyPrice),
+		prod_begin_price: prodBeginPrice && convertBegin > 0 ? convertBegin : 0,
+		prod_step_price: convertStep,
+		prod_buy_price: prodBuyPrice ? parseFloat(prodBuyPrice) : null,
 		prod_created_date: presentDate,
 		prod_expired_date: expireDate,
 		prod_updated_date: presentDate
@@ -234,100 +246,97 @@ router.post('/update', productValidation.updateProduct, async (req, res) => {
 	})
 })
 
-router.post('/update-image/:id', async (req, res) => {
-	const { id } = req.params // product id
-	const { imageId } = req.body
-	const prodImages = req.files //get file from req.files.image
+// router.post('/update-image/:id', async (req, res) => {
+// 	const { id } = req.params // product id
+// 	const { imageId } = req.body
+// 	const prodImages = req.files //get file from req.files.image
 
-	if (prodImages.image.length !== undefined) {
-		return res.status(400).json({
-			errorMessage: `Can Only Update 1 Image`,
-			statusCode: errorCode
-		})
-	}
+// 	if (prodImages.image.length !== undefined) {
+// 		return res.status(400).json({
+// 			errorMessage: `Can Only Update 1 Image`,
+// 			statusCode: errorCode
+// 		})
+// 	}
 
-	const checkExistProd = await productModel.findById(id)
+// 	const checkExistProd = await productModel.findById(id)
 
-	if (checkExistProd.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Product Doesn't Exist`,
-			statusCode: errorCode
-		})
-	}
+// 	if (checkExistProd.length === 0) {
+// 		return res.status(400).json({
+// 			errorMessage: `Product Doesn't Exist`,
+// 			statusCode: errorCode
+// 		})
+// 	}
 
-	const checkValidImage = imageproductValidation.validateValidImage(images)
+// 	const checkValidImage = imageproductValidation.validateValidImage(images)
 	
-	if (checkValidImage) {
+// 	if (checkValidImage) {
+// 		return res.status(400).json({
+// 			errorMessage: `Product's Image Isn't Right Type `,
+// 			statusCode: errorCode
+// 		})
+// 	}
+// 	//validate length of old image & new image
+// 	var numberOfNewImage = imageService.getImageLength(images)
+// 	var imagesNameArray = imageName.split(",")
+// 	var numberOfOldImage = imagesNameArray.length
+// 	var prodImgNumber = await knex.raw(`select count(prod_img_product_id) from tbl_product_images where prod_img_product_id = ${id}`)
+// 	prodImgNumber = prodImgNumber.rows[0].count
+
+
+// 	if (5 - prodImgNumber + numberOfOldImage - numberOfNewImage <= 0) {
+// 		return res.status(400).json({
+// 			errorMessage: "Number of image to update and number of image to delete is not valid, note that one product can have only 5 images",
+// 			statusCode: errorCode
+// 		})
+// 	}
+// 	//delete old image
+// 	if (numberOfOldImage > 0) {
+// 		var imageLink = await knex.raw(`select prod_img_data from tbl_product_images where prod_img_product_id = ${id}`)
+// 		imageLink = imageLink.rows
+// 		//console.log(imageLink.rows[0].prod_img_data)
+// 		for (let i = 0; i < numberOfOldImage; i++) {
+// 			for (let j = 0; j < imageLink.length; j++) {
+// 				if (imagesNameArray[i] == imageLink[j].prod_img_data) {
+// 					await knex.raw(`delete from tbl_product_images where prod_img_data = '${imageLink[j].prod_img_data}'`)
+// 					imageService.deleteImage(imageLink[j].prod_img_data);
+// 				}
+// 			}
+// 		}
+// 	}
+
+// 	//add new image
+// 	if (numberOfNewImage > 0) {
+// 		images = imageService.getImage(images)
+
+// 		if (images != null) {
+// 			if (images.length === undefined) {// number of uploaded image is 1
+// 				await imageService.productUploader(images, id, 'insert')
+// 			}
+// 			else {
+// 				for (let i = 0; i < images.length; i++) {
+// 					await imageService.productUploader(images[i], id, 'insert')
+// 				}
+// 			}
+// 		}
+// 	}
+
+// 	return res.status(200).json({
+// 		statusCode: successCode
+// 	})
+// })
+
+router.post('/delete', async (req, res) => {
+	const { prodId } = req.body
+	const checkExist = await productModel.findById(prodId)
+
+	if (checkExist.length === 0) {
 		return res.status(400).json({
-			errorMessage: `Product's Image Isn't Right Type `,
+			errorMessage: `Invalid Product Id`,
 			statusCode: errorCode
 		})
 	}
-	//validate length of old image & new image
-	var numberOfNewImage = imageService.getImageLength(images)
-	var imagesNameArray = imageName.split(",")
-	var numberOfOldImage = imagesNameArray.length
-	var prodImgNumber = await knex.raw(`select count(prod_img_product_id) from tbl_product_images where prod_img_product_id = ${id}`)
-	prodImgNumber = prodImgNumber.rows[0].count
 
-
-	if (5 - prodImgNumber + numberOfOldImage - numberOfNewImage <= 0) {
-		return res.status(400).json({
-			errorMessage: "Number of image to update and number of image to delete is not valid, note that one product can have only 5 images",
-			statusCode: errorCode
-		})
-	}
-	//delete old image
-	if (numberOfOldImage > 0) {
-		var imageLink = await knex.raw(`select prod_img_data from tbl_product_images where prod_img_product_id = ${id}`)
-		imageLink = imageLink.rows
-		//console.log(imageLink.rows[0].prod_img_data)
-		for (let i = 0; i < numberOfOldImage; i++) {
-			for (let j = 0; j < imageLink.length; j++) {
-				if (imagesNameArray[i] == imageLink[j].prod_img_data) {
-					await knex.raw(`delete from tbl_product_images where prod_img_data = '${imageLink[j].prod_img_data}'`)
-					imageService.deleteImage(imageLink[j].prod_img_data);
-				}
-			}
-		}
-	}
-
-	//add new image
-	if (numberOfNewImage > 0) {
-		images = imageService.getImage(images)
-
-		if (images != null) {
-			if (images.length === undefined) {// number of uploaded image is 1
-				await imageService.productUploader(images, id, 'insert')
-			}
-			else {
-				for (let i = 0; i < images.length; i++) {
-					await imageService.productUploader(images[i], id, 'insert')
-				}
-			}
-		}
-	}
-
-	return res.status(200).json({
-		statusCode: successCode
-	})
-})
-
-router.post('/delete/:id', async (req, res) => {
-	const { id } = req.params
-	var prod = await knex('tbl_product')
-		.where('prod_id', id)
-
-	if (prod.length === 0) {
-		var errorMessage = " Product record doesn't exist!"
-
-		return res.status(400).json({
-			errorMessage: errorMessage,
-			statusCode: 1
-		})
-	}
-	//call function
-	productModel.deleteProduct(id)
+	await productModel.del(prodId)
 
 	return res.status(200).json({
 		statusCode: successCode
