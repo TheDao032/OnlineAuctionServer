@@ -71,7 +71,6 @@ const updateProduct = (req, res, next) => {
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
-			prodDescription: { type: 'string' },
 		},
 		required: ['prodId'],
 		additionalProperties: true
@@ -94,23 +93,13 @@ const updateProduct = (req, res, next) => {
 	next()
 }
 
-const listSuggestion = (req, res, next) => {
+const updateImage = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			catId : { type: 'integer' }
+			prodId: { type: 'string', pattern: '^\\d+$' },
 		},
-		required: ['catId'],
-		additionalProperties: true
-	}
-
-	const shemaQuery = {
-		type: 'object',
-		properties: {
-			page: { type: 'integer' },
-			limit: { type: 'integer' }
-		},
-		required: [],
+		required: ['prodId'],
 		additionalProperties: true
 	}
 
@@ -121,19 +110,9 @@ const listSuggestion = (req, res, next) => {
 	const validatorBody = ajv.compile(shemaBody)
 	const validBody = validatorBody(req.body)
 
-	const validatorQuery = ajv.compile(shemaQuery)
-	const validQuery = validatorQuery(req.query)
-
 	if (!validBody) {
 		return res.status(400).json({
-			errorMessage: validQuery.errors[0].message,
-			statusCode: errorCode
-		})
-	}
-
-	if (!validQuery) {
-		return res.status(400).json({
-			errorMessage: validQuery.errors[0].message,
+			errorMessage: validParams.errors[0].message,
 			statusCode: errorCode
 		})
 	}
@@ -141,23 +120,14 @@ const listSuggestion = (req, res, next) => {
 	next()
 }
 
-const listByCategory = (req, res, next) => {
+const updateDescription = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			catId : { type: 'integer' }
+			prodId: { type: 'string', pattern: '^\\d+$' },
+			prodDescription: { type: 'string', minLength: 1 }
 		},
-		required: ['catId'],
-		additionalProperties: true
-	}
-
-	const shemaQuery = {
-		type: 'object',
-		properties: {
-			page: { type: 'integer' },
-			limit: { type: 'integer' }
-		},
-		required: [],
+		required: ['prodId', 'prodDescription'],
 		additionalProperties: true
 	}
 
@@ -168,47 +138,9 @@ const listByCategory = (req, res, next) => {
 	const validatorBody = ajv.compile(shemaBody)
 	const validBody = validatorBody(req.body)
 
-	const validatorQuery = ajv.compile(shemaQuery)
-	const validQuery = validatorQuery(req.query)
-
 	if (!validBody) {
 		return res.status(400).json({
-			errorMessage: validQuery.errors[0].message,
-			statusCode: errorCode
-		})
-	}
-
-	if (!validQuery) {
-		return res.status(400).json({
-			errorMessage: validQuery.errors[0].message,
-			statusCode: errorCode
-		})
-	}
-
-	next()
-}
-
-const listBestSale = (req, res, next) => {
-	const shema = {
-		type: 'object',
-		properties: {
-			limit: { type: 'integer' },
-			page: { type: 'integer' }
-		},
-		required: [],
-		additionalProperties: true
-	}
-
-	const ajv = new ajvLib({
-		allErrors: true
-	})
-
-	const validator = ajv.compile(shema)
-	const valid = validator(req.query)
-
-	if (!valid) {
-		return res.status(400).json({
-			errorMessage: "Value " + validator.errors[0].message,
+			errorMessage: validParams.errors[0].message,
 			statusCode: errorCode
 		})
 	}
@@ -246,8 +178,7 @@ module.exports = {
 	newProduct,
 	paramsInfo,
 	updateProduct,
-	listByCategory,
-	listSuggestion,
-	listBestSale,
-	productSearching
+	productSearching,
+	updateImage,
+	updateDescription
 }

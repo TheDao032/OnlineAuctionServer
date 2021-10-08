@@ -46,7 +46,7 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 	
 	const listProdInfo = await productModel.findAll()
 
-	const checkExistProd = listProdInfo.find((item) => (item.prod_name.toLowerCase() === prodName.toLowerCase()) && (item.prod_cate_id === prodCateId))
+	const checkExistProd = listProdInfo.find((item) => (item.prod_name.toLowerCase() === prodName.toLowerCase()) && (item.prod_cate_id === parseInt(prodCateId)))
 
 	if (checkExistProd) {
 		return res.status(400).json({
@@ -69,36 +69,6 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 			errorMessage: `Not Sub Categories`,
 			statusCode: errorCode
 		})
-	}
-
-	//validate image
-	if (checkProdImage) {
-		var checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
-
-		if (!checkValidImage) {
-			return res.status(400).json({
-				errorMessage: `Product's Images Type Is Invalid Or Product's Images Files Is Bigger Than 5`,
-				statusCode: errorCode
-			})
-		}
-
-		if (prodImage.image.length === undefined) {// number of uploaded image is 1
-			const newProdImage = {
-				prod_img_product_id: returnInfo[0].prod_id,
-				prod_img_data: prodImage.image
-			}
-	
-			await productImagesModel.create(newProdImage)
-		} else {
-			for (let i = 0; i < images.length; i++) {
-				const newProdImage = {
-					prod_img_product_id: returnInfo[0].prod_id,
-					prod_img_data: prodImage.image[i]
-				}
-		
-				await productImagesModel.create(newProdImage)
-			}
-		}
 	}
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -127,8 +97,37 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 		})
 	}
 
+	if (checkProdImage) {
+		var checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+
+		if (!checkValidImage) {
+			return res.status(400).json({
+				errorMessage: `Product's Images Type Is Invalid Or Product's Images Files Is Bigger Than 5`,
+				statusCode: errorCode
+			})
+		}
+
+		if (prodImage.image.length === undefined) {// number of uploaded image is 1
+			const newProdImage = {
+				prod_img_product_id: returnInfo[0],
+				prod_img_data: prodImage.image
+			}
+	
+			await productImagesModel.create(newProdImage)
+		} else {
+			for (let i = 0; i < prodImage.image.length; i++) {
+				const newProdImage = {
+					prod_img_product_id: returnInfo[0],
+					prod_img_data: prodImage.image[i]
+				}
+		
+				await productImagesModel.create(newProdImage)
+			}
+		}
+	}
+
 	const newProdDescription = {
-		prod_desc_prod_id: returnInfo[0].prod_id,
+		prod_desc_prod_id: returnInfo[0],
 		prod_desc_content: prodDescription ? prodDescription : '',
 		prod_desc_created_date: presentDate,
 		prod_desc_updated_date: presentDate
@@ -143,7 +142,7 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 })
 
 router.post('/update', productValidation.updateProduct, async (req, res) => {
-	const { prodId, prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription } = req.body
+	const { prodId, prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice } = req.body
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 	let updateProd = {}
@@ -246,84 +245,90 @@ router.post('/update', productValidation.updateProduct, async (req, res) => {
 	})
 })
 
-// router.post('/update-image/:id', async (req, res) => {
-// 	const { id } = req.params // product id
-// 	const { imageId } = req.body
-// 	const prodImages = req.files //get file from req.files.image
+router.post('/update-image', productValidation.updateImage, async (req, res) => {
+	const { prodId, prodImageId } = req.body
+	const prodImage = req.files
 
-// 	if (prodImages.image.length !== undefined) {
-// 		return res.status(400).json({
-// 			errorMessage: `Can Only Update 1 Image`,
-// 			statusCode: errorCode
-// 		})
-// 	}
+	let checkProdImage = false
+	if (prodImage) {
+		checkProdImage = prodImage.image ? true : false
+	}
 
-// 	const checkExistProd = await productModel.findById(id)
+	if (!checkProdImage) {
+		return res.status(400).json({
+			errorMessage: `Image Is Required`,
+			statusCode: errorCode
+		})
+	}
 
-// 	if (checkExistProd.length === 0) {
-// 		return res.status(400).json({
-// 			errorMessage: `Product Doesn't Exist`,
-// 			statusCode: errorCode
-// 		})
-// 	}
+	if (prodImage.image.length !== undefined) {
+		return res.status(400).json({
+			errorMessage: `Too Many Images Are Selected. Please Select 1 Image`,
+			statusCode: errorCode
+		})
+	}
 
-// 	const checkValidImage = imageproductValidation.validateValidImage(images)
+	const checkExistProd = await productModel.findById(prodId)
+
+	if (checkExistProd.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Product Doesn't Exist`,
+			statusCode: errorCode
+		})
+	}
+
+	const checkExistProdImage = await productImagesModel.findByIdAndProd(prodId, prodImageId)
+
+	if (checkExistProdImage.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Product Image Doesn't Exist`,
+			statusCode: errorCode
+		})
+	}
+
+	const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 	
-// 	if (checkValidImage) {
-// 		return res.status(400).json({
-// 			errorMessage: `Product's Image Isn't Right Type `,
-// 			statusCode: errorCode
-// 		})
-// 	}
-// 	//validate length of old image & new image
-// 	var numberOfNewImage = imageService.getImageLength(images)
-// 	var imagesNameArray = imageName.split(",")
-// 	var numberOfOldImage = imagesNameArray.length
-// 	var prodImgNumber = await knex.raw(`select count(prod_img_product_id) from tbl_product_images where prod_img_product_id = ${id}`)
-// 	prodImgNumber = prodImgNumber.rows[0].count
+	if (!checkValidImage) {
+		return res.status(400).json({
+			errorMessage: `Product's Image Isn't Right Type`,
+			statusCode: errorCode
+		})
+	}
 
+	const prodImageInfo = {
+		prod_img_data: prodImage.image
+	}
 
-// 	if (5 - prodImgNumber + numberOfOldImage - numberOfNewImage <= 0) {
-// 		return res.status(400).json({
-// 			errorMessage: "Number of image to update and number of image to delete is not valid, note that one product can have only 5 images",
-// 			statusCode: errorCode
-// 		})
-// 	}
-// 	//delete old image
-// 	if (numberOfOldImage > 0) {
-// 		var imageLink = await knex.raw(`select prod_img_data from tbl_product_images where prod_img_product_id = ${id}`)
-// 		imageLink = imageLink.rows
-// 		//console.log(imageLink.rows[0].prod_img_data)
-// 		for (let i = 0; i < numberOfOldImage; i++) {
-// 			for (let j = 0; j < imageLink.length; j++) {
-// 				if (imagesNameArray[i] == imageLink[j].prod_img_data) {
-// 					await knex.raw(`delete from tbl_product_images where prod_img_data = '${imageLink[j].prod_img_data}'`)
-// 					imageService.deleteImage(imageLink[j].prod_img_data);
-// 				}
-// 			}
-// 		}
-// 	}
+	await productImagesModel.update(prodImageId, prodImageInfo)
 
-// 	//add new image
-// 	if (numberOfNewImage > 0) {
-// 		images = imageService.getImage(images)
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
 
-// 		if (images != null) {
-// 			if (images.length === undefined) {// number of uploaded image is 1
-// 				await imageService.productUploader(images, id, 'insert')
-// 			}
-// 			else {
-// 				for (let i = 0; i < images.length; i++) {
-// 					await imageService.productUploader(images[i], id, 'insert')
-// 				}
-// 			}
-// 		}
-// 	}
+router.post('update-description', productValidation.updateDescription, async (req, res) => {
+	const { prodId, prodDescription } = req.body
 
-// 	return res.status(200).json({
-// 		statusCode: successCode
-// 	})
-// })
+	const checkExist = await productModel.findById(prodId)
+
+	if (checkExist.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Invalid Product Id`,
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	const updateProdDescription = {
+		prod_desc_prod_id: prodId,
+		prod_desc_content: prodDescription,
+		prod_desc_created_date: presentDate,
+		prod_desc_updated_date: presentDate
+	}
+
+	await productDescriptionModel.create(updateProdDescription)
+})
 
 router.post('/delete', async (req, res) => {
 	const { prodId } = req.body
@@ -335,6 +340,10 @@ router.post('/delete', async (req, res) => {
 			statusCode: errorCode
 		})
 	}
+
+	await productImagesModel.del(prodId)
+
+	await productDescriptionModel.del(prodId)
 
 	await productModel.del(prodId)
 
