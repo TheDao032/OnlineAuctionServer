@@ -8,6 +8,7 @@ const productValidation = require('../middlewares/validation/product.validate')
 const productModel = require('../models/product.model')
 const categoriesModel = require('../models/categories.model')
 const productImageModel = require('../models/productImage.model')
+const productDescriptionModel = require('../models/productDescription.model')
 
 const successCode = 0
 const errorCode = 1
@@ -89,6 +90,7 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 
 router.get('/list-time-out', async (req, res) => {
 	const allProduct = await productModel.findAll()
+	const prodImages = await productImageModel.findAll()
 
 	const listFilter = allProduct.filter((item) => {
 
@@ -103,6 +105,14 @@ router.get('/list-time-out', async (req, res) => {
 
 	if (listFilter.length > 0) {
 		const result = listFilter.map((element) => {
+			const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+				return {
+					prodImgId: info.prod_img_id,
+					prodImgProductId: info.prod_img_product_id,
+					prodImgData: info.prod_img_data
+				}
+			})
+
 			return {
 				prodId: element.prod_id,
 				prodName: element.prod_name,
@@ -111,6 +121,7 @@ router.get('/list-time-out', async (req, res) => {
 				prodBeginPrice: element.prod_begin_price,
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
+				prodImages: prodImageInfo,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -122,19 +133,15 @@ router.get('/list-time-out', async (req, res) => {
 		})
 	}
 
-	
-	return res.status(200).json({
-		listTimeOut: allProduct.slice(0, 5),
-		statusCode: successCode
-	})
-})
+	const result = allProduct.map((element) => {
+		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+			return {
+				prodImgId: info.prod_img_id,
+				prodImgProductId: info.prod_img_product_id,
+				prodImgData: info.prod_img_data
+			}
+		})
 
-router.get('/list-biggest-offer', async (req, res) => {
-	const allProduct = await productModel.findAll()
-
-	const listFilter = allProduct.sort((a, b) => b.prod_offer_number - a.prod_offer_number)
-
-	const result = listFilter.map((element) => {
 		return {
 			prodId: element.prod_id,
 			prodName: element.prod_name,
@@ -143,6 +150,42 @@ router.get('/list-biggest-offer', async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
+			prodImages: prodImageInfo,
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+		}
+	}).slice(0, 5)
+	
+	return res.status(200).json({
+		listTimeOut: result,
+		statusCode: successCode
+	})
+})
+
+router.get('/list-biggest-offer', async (req, res) => {
+	const allProduct = await productModel.findAll()
+	const prodImages = await productImageModel.findAll()
+
+	const listFilter = allProduct.sort((a, b) => b.prod_offer_number - a.prod_offer_number)
+
+	const result = listFilter.map((element) => {
+		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+			return {
+				prodImgId: info.prod_img_id,
+				prodImgProductId: info.prod_img_product_id,
+				prodImgData: info.prod_img_data
+			}
+		})
+
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			prodImages: prodImageInfo,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -156,10 +199,19 @@ router.get('/list-biggest-offer', async (req, res) => {
 
 router.get('/list-biggest-price', async (req, res) => {
 	const allProduct = await productModel.findAll()
+	const prodImages = await productImageModel.findAll()
 
 	const listFilter = allProduct.sort((a, b) => b.prod_begin_price - a.prod_begin_price)
 
 	const result = listFilter.map((element) => {
+		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+			return {
+				prodImgId: info.prod_img_id,
+				prodImgProductId: info.prod_img_product_id,
+				prodImgData: info.prod_img_data
+			}
+		})
+
 		return {
 			prodId: element.prod_id,
 			prodName: element.prod_name,
@@ -168,6 +220,7 @@ router.get('/list-biggest-price', async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
+			prodImages: prodImageInfo,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -216,40 +269,38 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 	})
 })
 
-router.post('/details', async (req, res) => {
+router.post('/detail', productValidation.details, async (req, res) => {
 	const { prodId } = req.body
 
-	var date = new Date();
-	var prod = await knex('tbl_product')
-		.where('prod_id', id)
+	const productInfo = await productModel.findById(prodId)
+	const productImageList = await productImageModel.findByProdId(prodId)
+	const productDescriptionList = await productDescriptionModel.findByProdId(prodId)
 
-	if (prod.length === 0) {
+	if (productInfo.length === 0) {
 		return res.status(400).json({
-			errorMessage: " Product record doesn't exist!",
+			errorMessage: `Invalid Product Id`,
 			statusCode: 1
 		})
 	}
-
-	var prodObject = {}
-	const prodResult = await knex.from('tbl_product')
-		.where('prod_id', id)
-		.returning('*')
-		.then(async (rows) => {
-			prodObject = rows[0];
-
-			var imageResult = await knex.from('tbl_product_images')
-				.where('prod_img_product_id', prodObject.prod_id);
-			prodObject['prod_img'] = imageResult.map(attr => attr.prod_img_data);
-		})
-	if (prodObject) {
-		return res.status(200).json({
-			listProductDetail: prodObject,
-			statusCode: successCode
-		})
-	}
+	
+	const result = productInfo.map((element) => {
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			prodImages: productImageList,
+			prodDescription: productDescriptionList,
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+		}
+	})
 
 	return res.status(200).json({
-		listProductDetail: [],
+		productDetail: result,
 		statusCode: errorCode
 	})
 })

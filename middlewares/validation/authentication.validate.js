@@ -34,9 +34,10 @@ const register = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		accPassword: { type: 'string', pattern: '', minLength: 1 },
+    		accPassword: { type: 'string', pattern: '', minLength: 1, maxLength: 36 },
     		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
     		accPhoneNumber: { type: 'string', pattern: '', maxLength: 15 },
+			accFullName: { type: 'string', pattern: '', maxLength: 100 },
     		accRole: { type: 'string', pattern: '', maxLength: 5}
   		},
 		required: ['accPassword', 'accEmail'],

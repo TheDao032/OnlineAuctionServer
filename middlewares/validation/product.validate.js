@@ -66,7 +66,7 @@ const updateProduct = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			prodId: { type: 'integer' },
+			prodId: { type: 'string', pattern: '^\\d+$' },
 			prodName: { type: 'string', maxLength: 60 },
 			prodCateId: { type: 'string', pattern: '^\\d+$' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
@@ -95,6 +95,33 @@ const updateProduct = (req, res, next) => {
 }
 
 const updateImage = (req, res, next) => {
+	const shemaBody = {
+		type: 'object',
+		properties: {
+			prodId: { type: 'string', pattern: '^\\d+$' },
+		},
+		required: ['prodId'],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validatorBody = ajv.compile(shemaBody)
+	const validBody = validatorBody(req.body)
+
+	if (!validBody) {
+		return res.status(400).json({
+			errorMessage: validParams.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
+const addImage = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
@@ -223,6 +250,33 @@ const listWithCate = (req, res, next) => {
 	next()
 }
 
+const details = (req, res, next) => {
+	const shema = {
+		type: 'object',
+		properties: {
+			prodId: { type: 'integer' }
+		},
+		required: [],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
+
+	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
 module.exports = {
 	newProduct,
 	queryInfo,
@@ -230,5 +284,7 @@ module.exports = {
 	productSearching,
 	updateImage,
 	updateDescription,
-	listWithCate
+	listWithCate,
+	addImage,
+	details
 }

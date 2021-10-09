@@ -98,7 +98,14 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 	}
 
 	if (checkProdImage) {
-		var checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+		if (prodImage.image.length > 5) {
+			return res.status(400).json({
+				errorMessage: `Image, Maximum Image Is 5`,
+				statusCode: errorCode
+			})
+		}
+
+		let checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 
 		if (!checkValidImage) {
 			return res.status(400).json({
@@ -107,7 +114,7 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 			})
 		}
 
-		if (prodImage.image.length === undefined) {// number of uploaded image is 1
+		if (prodImage.image.length === undefined) {
 			const newProdImage = {
 				prod_img_product_id: returnInfo[0],
 				prod_img_data: prodImage.image
@@ -301,6 +308,72 @@ router.post('/update-image', productValidation.updateImage, async (req, res) => 
 
 	await productImagesModel.update(prodImageId, prodImageInfo)
 
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
+router.post('/add-image', productValidation.addImage, async (req, res) => {
+	const { prodId } = req.body
+	const prodImage = req.files
+
+	let checkProdImage = false
+	if (prodImage) {
+		checkProdImage = prodImage.image ? true : false
+	}
+
+	if (!checkProdImage) {
+		return res.status(400).json({
+			errorMessage: `Image Is Required`,
+			statusCode: errorCode
+		})
+	}
+
+	const checkExistProd = await productModel.findById(prodId)
+
+	if (checkExistProd.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Product Doesn't Exist`,
+			statusCode: errorCode
+		})
+	}
+
+	const checkExistProdImage = await productImagesModel.findByProdId(prodId)
+
+	if ((checkExistProdImage.length + prodImage.image.length) > 5) {
+		return res.status(400).json({
+			errorMessage: `Already Have ${checkExistProdImage.length} Image, Maximum Image Is 5`,
+			statusCode: errorCode
+		})
+	}
+
+	const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+	
+	if (!checkValidImage) {
+		return res.status(400).json({
+			errorMessage: `Product's Image Isn't Right Type`,
+			statusCode: errorCode
+		})
+	}
+
+	if (prodImage.image.length === undefined) {
+		const newProdImage = {
+			prod_img_product_id: prodId,
+			prod_img_data: prodImage.image
+		}
+
+		await productImagesModel.create(newProdImage)
+	} else {
+		for (let i = 0; i < prodImage.image.length; i++) {
+			const newProdImage = {
+				prod_img_product_id: prodId,
+				prod_img_data: prodImage.image[i]
+			}
+	
+			await productImagesModel.create(newProdImage)
+		}
+	}
+	
 	return res.status(200).json({
 		statusCode: successCode
 	})
