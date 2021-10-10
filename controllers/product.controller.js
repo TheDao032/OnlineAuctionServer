@@ -306,23 +306,21 @@ router.post('/detail', productValidation.details, async (req, res) => {
 })
 
 router.post('/search', productValidation.productSearching, async (req, res) => {
-	const { prodName } = req.body
+	const { text, orderMode } = req.body
 	const { limit, page } = req.query
 
 	const prodImages = await productImageModel.findAll()
 
-	//FULL TEXT SEARCH
-	let prodListInfo = await knex.raw(`with product as (
-		SELECT *
-		FROM tbl_product
-		WHERE ts @@ to_tsquery('english', '${prodName}')
-		order by prod_created_date desc
-	)
-	select pr.* from product pr`)
+	let prodListInfo = await knex('tbl_product')
+							.whereRaw(`ts @@ to_tsquery('english', '${text}')`)
 
-	if (prodListInfo.rows.length > 0) {
-		prodListInfo = prodListInfo.rows
+	if (orderMode === 0) {
+		prodListInfo.sort((a, b) => b.prod_expired_date - a.prod_expired_date)
+	} else {
+		prodListInfo.sort((a, b) => a.prod_buy_price - b.prod_buy_price)
+	}
 
+	if (prodListInfo.length > 0) {
 		const result = prodListInfo.map((element) => {
 			const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
 				return {
@@ -331,7 +329,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					prodImgData: info.prod_img_data
 				}
 			})
-	
+
 			return {
 				prodId: element.prod_id,
 				prodName: element.prod_name,
@@ -345,15 +343,71 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
 		})
+
+		
 	
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(result.length / parseInt(limit))
+
+			if (result.length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = result.slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listProducts: paginationResult,
+				statusCode: successCode
+			})
+		}
+
 		return res.status(200).json({
 			listProducts: result,
 			statusCode: successCode
 		})
+	} else {
+		let cateListInfo = await knex('tbl_categories')
+								.whereRaw(`ts @@ to_tsquery('english', '${text}')`).sort((a, b) => a.cate_name - b.cate_name)
+	
+		if (cateListInfo.length > 0) {
+			const result = cateListInfo.map((element) => {
+				return {
+					cateId: element.cate_id,
+					catedName: element.cate_name,
+					createDate: moment(element.cate_created_date).format('YYYY-MM-DD HH:mm:ss'),
+					updateDate: moment(element.cate_updated_date).format('YYYY-MM-DD HH:mm:ss')
+				}
+			})
+		
+			if (page && limit) {
+				let startIndex = (parseInt(page) - 1) * parseInt(limit)
+				let endIndex = (parseInt(page) * parseInt(limit))
+				let totalPage = Math.floor(result.length / parseInt(limit))
+	
+				if (result.length % parseInt(limit) !== 0) {
+					totalPage = totalPage + 1
+				}
+		
+				const paginationResult = result.slice(startIndex, endIndex)
+		
+				return res.status(200).json({
+					totalPage,
+					listCategories: paginationResult,
+					statusCode: successCode
+				})
+			}
+	
+			return res.status(200).json({
+				listCategories: result,
+				statusCode: successCode
+			})
+		}
 	}
 	
 	return res.status(200).json({
-		listProducts: [],
 		statusCode: successCode
 	})
 })

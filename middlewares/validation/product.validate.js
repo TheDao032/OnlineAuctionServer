@@ -180,9 +180,10 @@ const productSearching = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			prodName: { type: 'string' }
+			text: { type: 'string' },
+			orderMode: {type: 'integer' }
 		},
-		required: [],
+		required: ['text', 'orderMode'],
 		additionalProperties: true
 	}
 
@@ -217,8 +218,8 @@ const listWithCate = (req, res, next) => {
 		allErrors: true
 	})
 
-	const validatorBody = ajv.compile(shema)
-	const validBody = validator(req.body)
+	const validatorBody = ajv.compile(shemaBody)
+	const validBody = validatorBody(req.body)
 
 	const shemaQuery = {
 		type: 'object',
@@ -231,7 +232,7 @@ const listWithCate = (req, res, next) => {
 	}
 
 	const validatorQuery = ajv.compile(shemaQuery)
-	const validQuery = validator(req.query)
+	const validQuery = validatorQuery(req.query)
 	
 	if (!validBody) {
 		return res.status(400).json({

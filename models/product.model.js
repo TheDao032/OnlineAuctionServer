@@ -9,7 +9,7 @@ const findById = async (prodId) => {
 
 const findByCateId = async (cateId) => {
 	const info = await knex('tbl_product')
-			.where({ prod_category_id: cateId })
+			.where({ prod_cate_id: cateId })
 
 	return info
 }
