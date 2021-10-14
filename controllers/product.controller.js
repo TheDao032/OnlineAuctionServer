@@ -309,10 +309,23 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 	const { text, orderMode } = req.body
 	const { limit, page } = req.query
 
+	const convertText = text.split(' ');
+
+	let searchCondition = ``
+	convertText.forEach((item, index) => {
+		if ((index + 1) !== convertText.length) {
+			searchCondition += item + ' & '
+		} else {
+			searchCondition += item
+		}
+	})
+	
 	const prodImages = await productImageModel.findAll()
+	const allProducts = await productModel.findAll()
+	const allCategories = await categoriesModel.findAll()
 
 	let prodListInfo = await knex('tbl_product')
-							.whereRaw(`ts @@ to_tsquery('english', '${text}')`)
+							.whereRaw(`ts @@ to_tsquery('english', '${searchCondition}')`)
 
 	if (orderMode === 0) {
 		prodListInfo.sort((a, b) => b.prod_expired_date - a.prod_expired_date)
@@ -343,8 +356,6 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
 		})
-
-		
 	
 		if (page && limit) {
 			let startIndex = (parseInt(page) - 1) * parseInt(limit)
@@ -370,44 +381,92 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 		})
 	} else {
 		let cateListInfo = await knex('tbl_categories')
-								.whereRaw(`ts @@ to_tsquery('english', '${text}')`).sort((a, b) => a.cate_name - b.cate_name)
+								.whereRaw(`ts @@ to_tsquery('english', '${searchCondition}')`)
 	
 		if (cateListInfo.length > 0) {
-			const result = cateListInfo.map((element) => {
+			const result = await Promise.all(
+				cateListInfo.map((element) => {
+				if (element.cate_father !== null) {
+					let resultProduct = []
+					const listProduct = allProducts.filter((prodInfo) => element.cate_id === prodInfo.prod_cate_id)
+
+					listProduct.forEach((prodInfo) => {
+						resultProduct.push(prodInfo)
+					})
+
+					return resultProduct
+				} else {
+					const listSubCategories = allCategories.filter((cateInfo) => cateInfo.cate_father === cateListInfo[0].cate_id)
+
+					let listProducts = []
+					listSubCategories.forEach((item) => {
+						const prodItem = allProducts.filter((prodInfo) => item.cate_id === prodInfo.prod_cate_id)
+
+						prodItem.forEach((prodInfo) => {
+							listProducts.push(prodInfo)
+						})
+					})
+
+					return listProducts
+				}
+			}))
+
+			const convertProduct = result[0].map((element) => {
+				const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+					return {
+						prodImgId: info.prod_img_id,
+						prodImgProductId: info.prod_img_product_id,
+						prodImgData: info.prod_img_data
+					}
+				})
+
 				return {
-					cateId: element.cate_id,
-					catedName: element.cate_name,
-					createDate: moment(element.cate_created_date).format('YYYY-MM-DD HH:mm:ss'),
-					updateDate: moment(element.cate_updated_date).format('YYYY-MM-DD HH:mm:ss')
+					prodId: element.prod_id,
+					prodName: element.prod_name,
+					prodCateId: element.prod_cate_id,
+					prodOfferNumber: element.prod_offer_number,
+					prodBeginPrice: element.prod_begin_price,
+					prodStepPrice: element.prod_step_price,
+					prodBuyPrice: element.prod_buy_price,
+					prodImages: prodImageInfo,
+					createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+					expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
 			})
+
+			if (orderMode === 0) {
+				convertProduct.sort((a, b) => b.prod_expired_date - a.prod_expired_date)
+			} else {
+				convertProduct.sort((a, b) => a.prod_buy_price - b.prod_buy_price)
+			}
 		
 			if (page && limit) {
 				let startIndex = (parseInt(page) - 1) * parseInt(limit)
 				let endIndex = (parseInt(page) * parseInt(limit))
-				let totalPage = Math.floor(result.length / parseInt(limit))
+				let totalPage = Math.floor(convertProduct.length / parseInt(limit))
 	
-				if (result.length % parseInt(limit) !== 0) {
+				if (convertProduct.length % parseInt(limit) !== 0) {
 					totalPage = totalPage + 1
 				}
 		
-				const paginationResult = result.slice(startIndex, endIndex)
+				const paginationResult = convertProduct.slice(startIndex, endIndex)
 		
 				return res.status(200).json({
 					totalPage,
-					listCategories: paginationResult,
+					listProducts: paginationResult,
 					statusCode: successCode
 				})
 			}
 	
 			return res.status(200).json({
-				listCategories: result,
+				listProducts: convertProduct,
 				statusCode: successCode
 			})
 		}
 	}
 	
 	return res.status(200).json({
+		listProducts: [],
 		statusCode: successCode
 	})
 })
