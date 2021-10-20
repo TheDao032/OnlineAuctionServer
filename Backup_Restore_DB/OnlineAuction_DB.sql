@@ -328,7 +328,7 @@ COPY public.tbl_categories (cate_id, cate_name, cate_father, cate_created_date, 
 -- Data for Name: tbl_comment; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tbl_comment (cmt_id, cmt_grade, cmt_content, cmt_acc_id, cmt_owner_id, cmt_created_date, cmt_updated_date) FROM stdin;
+COPY public.tbl_comment (cmt_id, cmt_vote, cmt_content, cmt_acc_id, cmt_owner_id, cmt_created_date, cmt_updated_date) FROM stdin;
 \.
 
 
@@ -532,7 +532,14 @@ ALTER TABLE ONLY public.tbl_account
 --
 
 ALTER TABLE ONLY public.tbl_comment
-    ADD CONSTRAINT tbl_cmt_acc_id_fkey FOREIGN KEY (cmt_acc_id) REFERENCES public.tbl_account(acc_id) NOT VALID;
+    ADD CONSTRAINT tbl_cmt_bidder_id_fkey FOREIGN KEY (cmt_bidder_id) REFERENCES public.tbl_account(acc_id) NOT VALID;
+
+--
+-- Name: tbl_comment tbl_cmt_acc_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tbl_comment
+    ADD CONSTRAINT tbl_cmt_seller_id_fkey FOREIGN KEY (cmt_seller_id) REFERENCES public.tbl_account(acc_id) NOT VALID;
 
 
 --
