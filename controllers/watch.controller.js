@@ -6,9 +6,9 @@ const accountValidation = require('../middlewares/validation/account.validate')
 
 const accountModel = require('../models/account.model')
 const productModel = require('../models/product.model')
-const cartModel = require('../models/cart.model')
+const cartModel = require('../models/watch.model')
 
-const cartValidation = require('../middlewares/validation/cart.validate')
+const cartValidation = require('../middlewares/validation/watch.validate')
 
 const successCode = 0
 const errorCode = 1

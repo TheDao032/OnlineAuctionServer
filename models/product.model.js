@@ -20,6 +20,13 @@ const findAll = async () => {
 	return info
 }
 
+const findByAccId = async (accId) => {
+	const info = await knex('tbl_product')
+			.where({ prod_acc_id: accId })
+
+	return info
+}
+
 const create = async (prodInfo) => {
 	const returning = await knex('tbl_product')
 			.insert(prodInfo)
@@ -44,6 +51,7 @@ module.exports = {
 	findById,
 	findByCateId,
 	findAll,
+	findByAccId,
 	create,
 	update,
 	del

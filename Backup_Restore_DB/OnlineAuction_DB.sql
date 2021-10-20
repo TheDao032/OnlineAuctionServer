@@ -58,10 +58,10 @@ CREATE TABLE public.tbl_account (
 ALTER TABLE public.tbl_account OWNER TO postgres;
 
 --
--- Name: tbl_cart_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: tbl_watch_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE public.tbl_cart_id_seq
+CREATE SEQUENCE public.tbl_watch_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -69,22 +69,22 @@ CREATE SEQUENCE public.tbl_cart_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tbl_cart_id_seq OWNER TO postgres;
+ALTER TABLE public.tbl_watch_id_seq OWNER TO postgres;
 
 --
--- Name: tbl_cart; Type: TABLE; Schema: public; Owner: postgres
+-- Name: tbl_watch; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE public.tbl_cart (
-    cart_id integer DEFAULT nextval('public.tbl_cart_id_seq'::regclass) NOT NULL,
-    cart_acc_id integer,
-    cart_prod_id integer,
-    cart_created_date timestamp without time zone,
-    cart_updated_date timestamp without time zone
+CREATE TABLE public.tbl_watch (
+    watch_id integer DEFAULT nextval('public.tbl_watch_id_seq'::regclass) NOT NULL,
+    watch_acc_id integer,
+    watch_prod_id integer,
+    watch_created_date timestamp without time zone,
+    watch_updated_date timestamp without time zone
 );
 
 
-ALTER TABLE public.tbl_cart OWNER TO postgres;
+ALTER TABLE public.tbl_watch OWNER TO postgres;
 
 --
 -- Name: tbl_categories_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
@@ -137,10 +137,10 @@ ALTER TABLE public.tbl_comment_id_seq OWNER TO postgres;
 
 CREATE TABLE public.tbl_comment (
     cmt_id integer DEFAULT nextval('public.tbl_comment_id_seq'::regclass) NOT NULL,
-    cmt_grade integer,
+    cmt_vote integer,
     cmt_content text,
-    cmt_acc_id integer NOT NULL,
-    cmt_owner_id integer NOT NULL,
+    cmt_bidder_id integer NOT NULL,
+    cmt_seller_id integer NOT NULL,
     cmt_created_date timestamp without time zone,
     cmt_updated_date timestamp without time zone
 );
@@ -170,6 +170,7 @@ CREATE TABLE public.tbl_product (
     prod_id integer DEFAULT nextval('public.tbl_product_id_seq'::regclass) NOT NULL,
     prod_name character varying(100),
     prod_cate_id integer,
+    prod_acc_id integer,
     prod_offer_number integer,
     prod_begin_price double precision,
     prod_step_price double precision,
@@ -254,6 +255,39 @@ CREATE TABLE public.tbl_roles (
 ALTER TABLE public.tbl_roles OWNER TO postgres;
 
 --
+-- Name: tbl_product_image_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE public.tbl_auction_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tbl_auction_id_seq OWNER TO postgres;
+
+--
+-- Name: tbl_auction; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tbl_auction (
+    auc_id integer DEFAULT nextval('public.tbl_auction_id_seq'::regclass) NOT NULL,
+    auc_bidder_id integer,
+    auc_seller_id integer,
+    auc_prod_id integer,
+    auc_is_biggest integer,
+    auc_is_banned integer,
+    auc_is_cancle integer,
+    auc_created_date timestamp without time zone,
+    auc_updated_date timestamp without time zone
+);
+
+
+ALTER TABLE public.tbl_auction OWNER TO postgres;
+
+--
 -- Data for Name: tbl_account; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
@@ -263,10 +297,10 @@ COPY public.tbl_account (acc_id, acc_password, acc_token, acc_email, acc_phone_n
 
 
 --
--- Data for Name: tbl_cart; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: tbl_watch; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tbl_cart (cart_id, cart_acc_id, cart_prod_id, cart_created_date, cart_updated_date) FROM stdin;
+COPY public.tbl_watch (watch_id, watch_acc_id, watch_prod_id, watch_created_date, watch_updated_date) FROM stdin;
 \.
 
 
@@ -367,10 +401,10 @@ SELECT pg_catalog.setval('public.tbl_account_id_seq', 2, true);
 
 
 --
--- Name: tbl_cart_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: tbl_watch_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tbl_cart_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tbl_watch_id_seq', 1, false);
 
 
 --
@@ -407,6 +441,12 @@ SELECT pg_catalog.setval('public.tbl_product_id_seq', 14, true);
 
 SELECT pg_catalog.setval('public.tbl_product_image_id_seq', 15, true);
 
+--
+-- Name: tbl_auction_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tbl_auction_id_seq', 1, false);
+
 
 --
 -- Name: tbl_account tbl_account_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
@@ -417,11 +457,11 @@ ALTER TABLE ONLY public.tbl_account
 
 
 --
--- Name: tbl_cart tbl_cart_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: tbl_watch tbl_watch_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY public.tbl_cart
-    ADD CONSTRAINT tbl_cart_pkey PRIMARY KEY (cart_id);
+ALTER TABLE ONLY public.tbl_watch
+    ADD CONSTRAINT tbl_watch_pkey PRIMARY KEY (watch_id);
 
 
 --
@@ -470,6 +510,13 @@ ALTER TABLE ONLY public.tbl_product
 
 ALTER TABLE ONLY public.tbl_roles
     ADD CONSTRAINT tbl_roles_pkey PRIMARY KEY (rol_id);
+
+--
+-- Name: tbl_auction tbl_auction_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tbl_auction
+    ADD CONSTRAINT tbl_auction_pkey PRIMARY KEY (auc_id);
 
 
 --
