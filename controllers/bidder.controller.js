@@ -46,4 +46,31 @@ router.post('/cancle', auctionStatusValidation.cancle, async (req, res) => {
 	})
 })
 
+router.post('/offer', auctionStatusValidation.cancle, async (req, res) => {
+	const { prodId, sellerId } = req.body
+	const { accId } = req.account
+
+	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(accId, prodId)
+
+	if (checkBidderAuctionExist.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Invalid Product Id`,
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	const auctionStatusInfo = {
+		stt_is_cancle: 1,
+		stt_updated_date: presentDate 
+	}
+
+	await auctionStatusModel.update(checkBidderAuctionExist[0].stt_id, auctionStatusInfo)
+	
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
 module.exports = router
