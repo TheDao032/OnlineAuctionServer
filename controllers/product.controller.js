@@ -3,7 +3,6 @@ const router = express.Router()
 const moment = require('moment');
 
 const knex = require('../utils/dbConnection')
-
 const productValidation = require('../middlewares/validation/product.validate')
 const productModel = require('../models/product.model')
 const categoriesModel = require('../models/categories.model')

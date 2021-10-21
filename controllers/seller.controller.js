@@ -10,14 +10,16 @@ const productModel = require('../models/product.model')
 const productImagesModel = require('../models/productImage.model')
 const productDescriptionModel = require('../models/productDescription.model')
 const auctionModel = require('../models/auction.model')
+const auctionStatusModel = require('../models/auctionStatus.model')
 
+const sellerValidation = require('../middlewares/validation/seller.validate')
 const productValidation = require('../middlewares/validation/product.validate')
 const auctionValidation = require('../middlewares/validation/auction.validate')
 
 const successCode = 0
 const errorCode = 1
 
-router.post('/add-product', productValidation.newProduct, async (req, res) => {
+router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 
 	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription } = req.body
 	const prodImage = req.files
@@ -150,7 +152,7 @@ router.post('/add-product', productValidation.newProduct, async (req, res) => {
 
 })
 
-router.post('/update-product', productValidation.updateProduct, async (req, res) => {
+router.post('/update-product', sellerValidation.updateProduct, async (req, res) => {
 	const { prodId, prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice } = req.body
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -254,7 +256,7 @@ router.post('/update-product', productValidation.updateProduct, async (req, res)
 	})
 })
 
-router.post('/update-image', productValidation.updateImage, async (req, res) => {
+router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 	const { prodId, prodImageId } = req.body
 	const prodImage = req.files
 
@@ -315,7 +317,7 @@ router.post('/update-image', productValidation.updateImage, async (req, res) => 
 	})
 })
 
-router.post('/add-image', productValidation.addImage, async (req, res) => {
+router.post('/add-image', sellerValidation.addImage, async (req, res) => {
 	const { prodId } = req.body
 	const prodImage = req.files
 
@@ -381,7 +383,7 @@ router.post('/add-image', productValidation.addImage, async (req, res) => {
 	})
 })
 
-router.post('/update-description', productValidation.updateDescription, async (req, res) => {
+router.post('/update-description', sellerValidation.updateDescription, async (req, res) => {
 	const { prodId, prodDescription } = req.body
 
 	const checkExist = await productModel.findById(prodId)
@@ -409,10 +411,10 @@ router.post('/update-description', productValidation.updateDescription, async (r
     })
 })
 
-router.post('/ban-bidder', auctionValidation.banBidder, async (req, res) => {
-	const { aucId } = req.body
+router.post('/ban-bidder', sellerValidation.banBidder, async (req, res) => {
+	const { bidderId, prodId } = req.body
 
-	const checkExist = await auctionModel.findById(aucId)
+	const checkExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
 
 	if (checkExist.length === 0) {
 		return res.status(400).json({
@@ -423,12 +425,12 @@ router.post('/ban-bidder', auctionValidation.banBidder, async (req, res) => {
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-	const updateAuction = {
-		auc_is_banned: 1,
-		auc_updated_date: presentDate
+	const updateAuctionStatus = {
+		stt_is_banned: 1,
+		stt_updated_date: presentDate
 	}
 
-	await productDescriptionModel.update(aucId, updateAuction)
+	await productDescriptionModel.update(checkExist[0].stt_id, updateAuctionStatus)
 })
 
 router.get('/my-product', productValidation.queryInfo, async (req, res) => {
@@ -509,14 +511,11 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
 
 router.get('/bought-product', productValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
-
     const { accId } = req.account
 
     const prodDescription = await productDescriptionModel.findAll()
     const prodImages = await productImagesModel.findAll()
-
-    const auctionList = await auctionModel.findBySellerId(accId)
-
+    const auctionList = await auctionStatusModel.findBySellerId(accId)
 	const listProduct = await productModel.findAll()
 
     var convertListProduct = listProduct.map((element) => {
@@ -599,7 +598,7 @@ router.get('/bought-product', productValidation.queryInfo, async (req, res) => {
 	
 })
 
-router.post('/delete', async (req, res) => {
+router.post('/delete', sellerValidation.deleteProduct, async (req, res) => {
 	const { prodId } = req.body
 	const checkExist = await productModel.findById(prodId)
 

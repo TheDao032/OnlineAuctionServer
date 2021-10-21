@@ -1,38 +1,38 @@
 const knex = require('../utils/dbConnection')
 
 const findByAccAndProduct = async (accId, prodId) => {
-	const info = await knex('tbl_cart')
-					.where({ cart_acc_id: accId, cart_prod_id: prodId })
+	const info = await knex('tbl_watch')
+					.where({ watch_acc_id: accId, watch_prod_id: prodId })
 
     return info
 }
 
 const findByAcc = async (accId) => {
-	const info = await knex('tbl_cart')
-					.where({ cart_acc_id: accId })
+	const info = await knex('tbl_watch')
+					.where({ watch_acc_id: accId })
 
     return info
 }
 
-const findById = async (cartId) => {
-	const info = await knex('tbl_cart')
-					.where({ cart_id: cartId })
+const findById = async (watchId) => {
+	const info = await knex('tbl_watch')
+					.where({ watch_id: watchId })
 
     return info
 }
 
-const updateCart = async (cartId, cartObject) => {
-	const returnInfo = await knex('tbl_cart')
-			.update(cartObject)
-			.where({ cart_id: cartId }).returning('cart_id')
+const updateWatch = async (watchId, watchInfo) => {
+	const returnInfo = await knex('tbl_watch')
+			.update(watchInfo)
+			.where({ watch_id: watchId }).returning('watch_id')
 
 	return returnInfo[0]
 }
 
 
-const addcart = async (cartObject) => {
-	const returnInfo = await knex('tbl_cart')
-			.insert(cartObject).returning('cart_id')
+const addWatch = async (watchInfo) => {
+	const returnInfo = await knex('tbl_watch')
+			.insert(watchInfo).returning('watch_id')
 
 	return returnInfo[0]
 }
@@ -40,7 +40,7 @@ const addcart = async (cartObject) => {
 module.exports = {
 	findByAccAndProduct,
 	findByAcc,
-	updateCart,
-	addcart,
+	updateWatch,
+	addWatch,
 	findById
 }

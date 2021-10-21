@@ -277,15 +277,42 @@ CREATE TABLE public.tbl_auction (
     auc_bidder_id integer,
     auc_seller_id integer,
     auc_prod_id integer,
-    auc_is_biggest integer,
-    auc_is_banned integer,
-    auc_is_cancle integer,
+	auc_price double precision,
     auc_created_date timestamp without time zone,
     auc_updated_date timestamp without time zone
 );
 
 
 ALTER TABLE public.tbl_auction OWNER TO postgres;
+
+CREATE SEQUENCE public.tbl_auction_status_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.tbl_auction_status_id_seq OWNER TO postgres;
+
+--
+-- Name: tbl_auction; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.tbl_auction_status (
+    stt_id integer DEFAULT nextval('public.tbl_auction_status_id_seq'::regclass) NOT NULL,
+    stt_bidder_id integer,
+    stt_seller_id integer,
+    stt_prod_id integer,
+    stt_is_biggest integer,
+    stt_is_banned integer,
+    stt_is_cancle integer,
+    stt_created_date timestamp without time zone,
+    stt_updated_date timestamp without time zone
+);
+
+
+ALTER TABLE public.tbl_auction_status OWNER TO postgres;
 
 --
 -- Data for Name: tbl_account; Type: TABLE DATA; Schema: public; Owner: postgres
@@ -449,6 +476,12 @@ SELECT pg_catalog.setval('public.tbl_auction_id_seq', 1, false);
 
 
 --
+-- Name: tbl_auction_status_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('public.tbl_auction_status_id_seq', 1, false);
+
+--
 -- Name: tbl_account tbl_account_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -517,6 +550,13 @@ ALTER TABLE ONLY public.tbl_roles
 
 ALTER TABLE ONLY public.tbl_auction
     ADD CONSTRAINT tbl_auction_pkey PRIMARY KEY (auc_id);
+
+--
+-- Name: tbl_auction tbl_auction_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tbl_auction_status
+    ADD CONSTRAINT tbl_auction_status_pkey PRIMARY KEY (stt_id);
 
 
 --

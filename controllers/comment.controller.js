@@ -89,6 +89,7 @@ router.post('/bad-comment', commentValidation.badComment, async (req, res) => {
         cmt_bidder_id: bidderId,
         cmt_seller_id: sellerId,
         cmt_vote: -1,
+		cmt_content: 'Khách Hàng Không Thanh Toán',
         cmt_created_date: presentDate,
         cmt_updated_date: presentDate
     }

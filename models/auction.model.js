@@ -20,9 +20,23 @@ const findByBidderId = async (bidderId) => {
     return info
 }
 
+const findByBidderAndProduct = async (bidderId, prodId) => {
+    const info = await knex('tbl_auction')
+                    .where({ auc_bidder_id: bidderId, auc_prod_id: prodId })
+
+    return info
+}
+
 const findBySellerId = async (sellerId) => {
     const info = await knex('tbl_auction')
                     .where({ auc_seller_id: sellerId })
+
+    return info
+}
+
+const findBySellerAndProduct = async (sellerId, prodId) => {
+    const info = await knex('tbl_auction')
+                    .where({ auc_seller_id: sellerId, auc_prod_id: prodId })
 
     return info
 }
@@ -46,6 +60,18 @@ const update = async (aucId, aucInfo) => {
         .update(aucInfo)
 }
 
+const updateWithBidderAndProd = async (bidderId, prodId, aucInfo) => {
+    await knex('tbl_auction')
+        .where({ auc_bidder_id: bidderId, auc_prod_id: prodId })
+        .update(aucInfo)
+}
+
+const updateWithSellerAndProd = async (sellerId, prodId, aucInfo) => {
+    await knex('tbl_auction')
+        .where({ auc_seller_id: sellerId, auc_prod_id: prodId })
+        .update(aucInfo)
+}
+
 const del = async (aucId) => {
     await knex('tbl_auction')
         .where({ auc_id: aucId })
@@ -60,5 +86,9 @@ module.exports = {
     findAll,
     create,
     update,
-    del
+    del,
+	findByBidderAndProduct,
+	findBySellerAndProduct,
+	updateWithSellerAndProd,
+	updateWithBidderAndProd
 }

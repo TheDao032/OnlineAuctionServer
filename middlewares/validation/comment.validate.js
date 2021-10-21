@@ -35,7 +35,7 @@ const newComment = (req, res, next) => {
 		properties: {
 			bidderId: { type: 'integer' },
 			prodId: { type: 'integer' },
-			cmtContent: { type: 'string', pattern: '' , maxLength: 200, minLength: 1 },
+			cmtContent: { type: 'string', pattern: '' , maxLength: 200 },
 			cmtVote: { type: 'integer' }
 		},
 		required: ['prodId', 'bidderId', 'cmtContent', 'cmtVote'],
