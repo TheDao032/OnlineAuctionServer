@@ -17,7 +17,7 @@ const auctionValidation = require('../middlewares/validation/auction.validate')
 const successCode = 0
 const errorCode = 1
 
-router.post('/add', productValidation.newProduct, async (req, res) => {
+router.post('/add-product', productValidation.newProduct, async (req, res) => {
 
 	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription } = req.body
 	const prodImage = req.files
@@ -150,7 +150,7 @@ router.post('/add', productValidation.newProduct, async (req, res) => {
 
 })
 
-router.post('/update', productValidation.updateProduct, async (req, res) => {
+router.post('/update-product', productValidation.updateProduct, async (req, res) => {
 	const { prodId, prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice } = req.body
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -412,7 +412,7 @@ router.post('/update-description', productValidation.updateDescription, async (r
 router.post('/ban-bidder', auctionValidation.banBidder, async (req, res) => {
 	const { aucId } = req.body
 
-	const checkExist = await auctionModel.findByAccAndProduct(accId, prodId)
+	const checkExist = await auctionModel.findById(aucId)
 
 	if (checkExist.length === 0) {
 		return res.status(400).json({

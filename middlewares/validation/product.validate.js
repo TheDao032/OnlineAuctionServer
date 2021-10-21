@@ -6,7 +6,7 @@ const newProduct = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			prodName: { type: 'string', maxLength: 60 },
+			prodName: { type: 'string', maxLength: 100 },
 			prodCateId: { type: 'string', pattern: '^\\d+$' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
