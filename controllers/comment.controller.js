@@ -14,10 +14,10 @@ const successCode = 0
 const errorCode = 1
 
 router.post('/new-comment', commentValidation.newComment, async (req, res) => {
-    const { bidderId, cmtContent, cmtVote, prodId } = req.body
+    const { toId, cmtContent, cmtVote, prodId } = req.body
     const { accId } = req.account
 
-    const checkBidderExist = await accountModel.findById(bidderId)
+    const checkBidderExist = await accountModel.findById(toId)
 
     if (checkBidderExist.length === 0) {
         return res.status(400).json({
@@ -38,8 +38,8 @@ router.post('/new-comment', commentValidation.newComment, async (req, res) => {
     const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
     const commentInfo = {
-        cmt_bidder_id: bidderId,
-        cmt_seller_id: accId,
+        cmt_to_id: toId,
+        cmt_from_id: accId,
         cmt_vote: cmtVote,
         cmt_content: cmtContent,
         cmt_created_date: presentDate,
@@ -54,9 +54,9 @@ router.post('/new-comment', commentValidation.newComment, async (req, res) => {
 })
 
 router.post('/bad-comment', commentValidation.badComment, async (req, res) => {
-    const { bidderId, prodId, sellerId } = req.body
+    const { toId, prodId, fromId } = req.body
 
-    const checkBidderExist = await accountModel.findById(bidderId)
+    const checkBidderExist = await accountModel.findById(toId)
 
     if (checkBidderExist.length === 0) {
         return res.status(400).json({
@@ -65,7 +65,7 @@ router.post('/bad-comment', commentValidation.badComment, async (req, res) => {
         })
     }
 
-    const checkSellerExist = await accountModel.findById(sellerId)
+    const checkSellerExist = await accountModel.findById(fromId)
 
     if (checkSellerExist.length === 0) {
         return res.status(400).json({
@@ -86,8 +86,8 @@ router.post('/bad-comment', commentValidation.badComment, async (req, res) => {
     const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
     const commentInfo = {
-        cmt_bidder_id: bidderId,
-        cmt_seller_id: sellerId,
+        cmt_to_id: toId,
+        cmt_from_id: fromId,
         cmt_vote: -1,
 		cmt_content: 'Khách Hàng Không Thanh Toán',
         cmt_created_date: presentDate,

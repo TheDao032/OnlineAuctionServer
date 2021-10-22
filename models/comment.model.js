@@ -13,15 +13,15 @@ const findAll = async () => {
 	return info
 }
 
-const findByBidderId = async (bidderId) => {
+const findByToId = async (accId) => {
 	const info = await knex('tbl_comment')
-			.where({ cmt_bidder_id: bidderId })
+			.where({ cmt_to_id: accId })
 
 	return info
 }
-const findBySellerId = async (sellerId) => {
+const findByFromId = async (accId) => {
 	const info = await knex('tbl_comment')
-			.where({ cmt_seller_id: sellerId })
+			.where({ cmt_from_id: accId })
 
 	return info
 }
@@ -48,9 +48,9 @@ const del = async (cmtId) => {
 
 module.exports = {
 	findById,
-	findByBidderId,
+	findByToId,
 	findAll,
-	findBySellerId,
+	findByFromId,
 	create,
 	update,
 	del
