@@ -8,11 +8,13 @@ const productModel = require('../models/product.model')
 const categoriesModel = require('../models/categories.model')
 const productImageModel = require('../models/productImage.model')
 const productDescriptionModel = require('../models/productDescription.model')
+const auctionModel = require('../models/auction.model')
+const accountModel = require('../models/account.model')
 
 const successCode = 0
 const errorCode = 1
 
-router.get('/list', productValidation.queryInfo, async (req, res) => {
+router.get('/list-each-cate', productValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 
 	const allCategories = await categoriesModel.findAll()
@@ -54,6 +56,69 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			}
 		})
 	])
+	
+	if (result) {
+		result[0].sort((a, b) => a - b)
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(result[0].length / parseInt(limit))
+
+			if (result[0].length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = result[0].slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listProducts: paginationResult,
+				statusCode: successCode
+			})
+		}
+		
+		return res.status(200).json({
+			listProducts: result[0],
+			statusCode: successCode
+		})
+	}
+
+	return res.status(200).json({
+		listProducts: [],
+		statusCode: errorCode
+	})
+})
+
+router.get('/list', productValidation.queryInfo, async (req, res) => {
+	const { page, limit } = req.query
+
+	const allProducts = await productModel.findAll()
+	const listBidder = await auctionModel.findAll()
+	const allAccount = await accountModel.findAll()
+	
+	const convertListProduct = allProducts.map((element) => {
+		const listBidderWithProd = listBidder.filter((item) => item.auc_is_biggest === 0)
+		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+			return {
+				accId: item.acc_id,
+				accName: item.acc_name
+			}
+		})
+
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			owner: accountInfo,
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+		}
+	})
+
 	
 	if (result) {
 		result[0].sort((a, b) => a - b)
