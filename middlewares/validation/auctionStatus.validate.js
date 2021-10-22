@@ -17,7 +17,7 @@ const cancle = (req, res, next) => {
 	})
 
 	const validator = ajv.compile(shema)
-	const valid = validator(req.query)
+	const valid = validator(req.body)
 
 	if (!valid) {
 		return res.status(400).json({
@@ -34,9 +34,9 @@ const offer = (req, res, next) => {
 		type: 'object',
 		properties: {
 			prodId: { type: 'integer' },
-			bidderId: { type: 'integer' },
+			aucPriceOffer: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 		},
-		required: ['prodId'],
+		required: ['prodId', 'aucPriceOffer'],
 		additionalProperties: true
 	}
 
@@ -45,7 +45,7 @@ const offer = (req, res, next) => {
 	})
 
 	const validator = ajv.compile(shema)
-	const valid = validator(req.query)
+	const valid = validator(req.body)
 
 	if (!valid) {
 		return res.status(400).json({

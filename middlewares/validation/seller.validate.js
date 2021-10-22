@@ -230,6 +230,34 @@ const banBidder = (req, res, next) => {
 	next()
 }
 
+const givePermission = (req, res, next) => {
+	const shema = {
+		type: 'object',
+		properties: {
+			bidderId: { type: 'integer' },
+			prodId: { type: 'integer' }
+		},
+		required: ['bidderId', 'prodId'],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
+
+	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
 module.exports = {
 	deleteProduct,
 	myProduct,
@@ -238,5 +266,6 @@ module.exports = {
 	updateImage,
 	updateProduct,
 	newProduct,
-	banBidder
+	banBidder,
+	givePermission
 }

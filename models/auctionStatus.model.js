@@ -52,6 +52,12 @@ const updateWithBidderAndProd = async (bidderId, prodId, aucStatusInfo) => {
         .update(aucStatusInfo)
 }
 
+const updateWithProdId = async (prodId, aucStatusInfo) => {
+    await knex('tbl_auction_status')
+        .where({ stt_prod_id: prodId })
+        .update(aucStatusInfo)
+}
+
 const del = async (sttId) => {
     await knex('tbl_auction_status')
         .where({ stt_id: sttId })
@@ -67,5 +73,6 @@ module.exports = {
     update,
     del,
 	findByBidderAndProduct,
-	updateWithBidderAndProd
+	updateWithBidderAndProd,
+    updateWithProdId
 }

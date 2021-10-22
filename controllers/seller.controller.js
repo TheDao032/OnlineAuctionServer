@@ -11,6 +11,7 @@ const productImagesModel = require('../models/productImage.model')
 const productDescriptionModel = require('../models/productDescription.model')
 const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
+const auctionPermissionModel = require('../models/auctionPermission.model')
 
 const sellerValidation = require('../middlewares/validation/seller.validate')
 const productValidation = require('../middlewares/validation/product.validate')
@@ -614,6 +615,32 @@ router.post('/delete', sellerValidation.deleteProduct, async (req, res) => {
 	await productDescriptionModel.del(prodId)
 
 	await productModel.del(prodId)
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
+router.post('/give-permission', sellerValidation.givePermission, async (req, res) => {
+	const { bidderId, prodId } = req.body
+	
+	const permissionInfo = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
+
+	if (permissionInfo.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Invalid Product Id Or Bidder Id`,
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	const updatePermission = {
+		per_can_auction: 0,
+		per_updated_date: presentDate
+	}
+
+	await auctionPermissionModel.update(permissionInfo[0].per_id, updatePermission)
 
 	return res.status(200).json({
 		statusCode: successCode
