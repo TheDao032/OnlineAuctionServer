@@ -275,9 +275,8 @@ ALTER TABLE public.tbl_auction_id_seq OWNER TO postgres;
 CREATE TABLE public.tbl_auction (
     auc_id integer DEFAULT nextval('public.tbl_auction_id_seq'::regclass) NOT NULL,
     auc_bidder_id integer,
-    auc_seller_id integer,
     auc_prod_id integer,
-	auc_price double precision,
+	auc_price_offer double precision,
     auc_created_date timestamp without time zone,
     auc_updated_date timestamp without time zone
 );
@@ -302,9 +301,9 @@ ALTER TABLE public.tbl_auction_status_id_seq OWNER TO postgres;
 CREATE TABLE public.tbl_auction_status (
     stt_id integer DEFAULT nextval('public.tbl_auction_status_id_seq'::regclass) NOT NULL,
     stt_bidder_id integer,
-    stt_seller_id integer,
     stt_prod_id integer,
     stt_is_biggest integer,
+    stt_biggest_price double precision,
     stt_is_banned integer,
     stt_is_cancle integer,
     stt_created_date timestamp without time zone,
