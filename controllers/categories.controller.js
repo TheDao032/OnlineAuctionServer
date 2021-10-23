@@ -10,7 +10,7 @@ const productModel = require('../models/product.model')
 const errorCode = 1
 const successCode = 0
 
-router.get('/list', categoriesValidation.paramsInfo, async (req, res) => {
+router.get('/list', categoriesValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 
 	const allCategories = await categoriesModel.findAll()
@@ -72,7 +72,7 @@ router.get('/list', categoriesValidation.paramsInfo, async (req, res) => {
 	})
 })
 
-router.get('/list-father', categoriesValidation.paramsInfo, async (req, res) => {
+router.get('/list-father', categoriesValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 
 	const listCategoriesFather = await categoriesModel.findFather()

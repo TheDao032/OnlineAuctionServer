@@ -6,40 +6,41 @@ const accountValidation = require('../middlewares/validation/account.validate')
 
 const accountModel = require('../models/account.model')
 const productModel = require('../models/product.model')
-const cartModel = require('../models/watch.model')
+const watchModel = require('../models/watch.model')
 
-const cartValidation = require('../middlewares/validation/watch.validate')
+const watchValidation = require('../middlewares/validation/watch.validate')
 
 const successCode = 0
 const errorCode = 1
 
-router.get('/list', async (req, res) => {
+router.get('/list', watchValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 	const { accId } = req.account
 
-	const listCart = await cartModel.findByAcc(accId)
+	const listWatch = await watchModel.findByAcc(accId)
 
-	if (listCart.length === 0) {
+	if (listWatch.length === 0) {
 		return res.status(200).json({
-			errorMessage: 'Customer Does Not Have Any Product In Cart'
+			errorMessage: 'Customer Does Not Have Any Product In Watch List'
 		})
 	}
 	const listProduct = await productModel.findAll()
 
-	let totalPrice = 0
-	let totalAmount = 0
-
 	const result = await Promise.all([
-		listCart.map((item) => {
-			const productInfo = listProduct.find((info) => info.prod_id === item.cart_prod_id)
+		listWatch.map((item) => {
+			const productInfo = listProduct.find((info) => info.prod_id === item.watch_prod_id)
 
 			if (productInfo) {
-				totalPrice = totalPrice + item.cart_amount * parseInt(productInfo.prod_price)
-				totalAmount = totalAmount + item.cart_amount
 				return {
 					prodId: productInfo.prod_id,
-					cartAmount: item.cart_amount,
-					cartPrice: productInfo.prod_price
+					prodName: productInfo.prod_name,
+					prodCateId: productInfo.prod_cate_id,
+					prodOfferNumber: productInfo.prod_offer_number,
+					prodBeginPrice: productInfo.prod_begin_price,
+					prodStepPrice: productInfo.prod_step_price,
+					prodBuyPrice: productInfo.prod_buy_price,
+					createDate: moment(productInfo.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+					expireDate: moment(productInfo.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
 			}
 
@@ -56,7 +57,7 @@ router.get('/list', async (req, res) => {
 			})
 		}
 
-		if (page || limit) {
+		if (page && limit) {
 			let startIndex = (parseInt(page) - 1) * parseInt(limit)
 			let endIndex = (parseInt(page) * parseInt(limit))
 			let totalPage = Math.floor(result[0].length / parseInt(limit))
@@ -71,13 +72,13 @@ router.get('/list', async (req, res) => {
 				totalPage,
 				totalAmount,
 				totalPrice,
-				listCart: paginationResult,
+				listWatch: paginationResult,
 				statusCode: successCode
 			})
 		}
 
 		return res.status(200).json({
-			listCart: result[0],
+			listWatch: result[0],
 			totalAmount,
 			totalPrice,
 			statusCode: successCode
@@ -89,7 +90,7 @@ router.get('/list', async (req, res) => {
 	})
 })
 
-router.post('/add', cartValidation.addCart, async (req, res) => {
+router.post('/add', watchValidation.addWatch, async (req, res) => {
     const { prodId } = req.body
 	const { accId } = req.account
 

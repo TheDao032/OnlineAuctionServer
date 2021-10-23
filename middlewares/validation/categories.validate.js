@@ -112,6 +112,26 @@ const listCategoryChild = (req, res, next) => {
 		})
 	}
 
+	const shemaQuery = {
+  		type: 'object',
+  		properties: {
+    		page: { type: 'string', pattern: '^\\d+$' },
+			limit: { type: 'string', pattern: '^\\d+$' }
+  		},
+		required: [],
+		additionalProperties: true
+	}
+
+	const validatorQuery = ajv.compile(shemaQuery)
+	const validQuery = validatorQuery(req.query)
+
+	if (!validQuery) {
+		return res.status(400).json({
+			errorMessage: validatorQuery.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
 	next()
 }
 
@@ -142,7 +162,7 @@ const deleteCategory = (req, res, next) => {
 	next()
 }
 
-const paramsInfo = (req, res, next) => {
+const queryInfo = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
@@ -176,5 +196,5 @@ module.exports = {
     listCategoryChild,
 	deleteCategory,
 	updateCategory,
-	paramsInfo
+	queryInfo
 }
