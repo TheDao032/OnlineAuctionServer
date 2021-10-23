@@ -381,14 +381,6 @@ COPY public.tbl_categories (cate_id, cate_name, cate_father, cate_created_date, 
 
 
 --
--- Data for Name: tbl_comment; Type: TABLE DATA; Schema: public; Owner: cv14004mac-3g
---
-
-COPY public.tbl_comment (cmt_id, cmt_vote, cmt_content, cmt_bidder_id, cmt_seller_id, cmt_created_date, cmt_updated_date) FROM stdin;
-\.
-
-
---
 -- Data for Name: tbl_product; Type: TABLE DATA; Schema: public; Owner: cv14004mac-3g
 --
 
@@ -620,18 +612,18 @@ ALTER TABLE ONLY public.tbl_account
 
 
 --
--- Name: tbl_comment tbl_cmt_bidder_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cv14004mac-3g
+-- Name: tbl_comment tbl_cmt_from_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cv14004mac-3g
 --
 
 ALTER TABLE ONLY public.tbl_comment
-    ADD CONSTRAINT tbl_cmt_bidder_id_fkey FOREIGN KEY (cmt_bidder_id) REFERENCES public.tbl_account(acc_id) NOT VALID;
+    ADD CONSTRAINT tbl_cmt_from_id_fkey FOREIGN KEY (cmt_from_id) REFERENCES public.tbl_account(acc_id) NOT VALID;
 
 --
--- Name: tbl_comment tbl_cmt_seller_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cv14004mac-3g
+-- Name: tbl_comment tbl_cmt_to_id_fkey; Type: FK CONSTRAINT; Schema: public; Owner: cv14004mac-3g
 --
 
 ALTER TABLE ONLY public.tbl_comment
-    ADD CONSTRAINT tbl_cmt_seller_id_fkey FOREIGN KEY (cmt_seller_id) REFERENCES public.tbl_account(acc_id) NOT VALID;
+    ADD CONSTRAINT tbl_cmt_to_id_fkey FOREIGN KEY (cmt_to_id) REFERENCES public.tbl_account(acc_id) NOT VALID;
 
 
 --

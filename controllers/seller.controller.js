@@ -647,4 +647,52 @@ router.post('/give-permission', sellerValidation.givePermission, async (req, res
 	})
 })
 
+router.post('/take-permission', sellerValidation.givePermission, async (req, res) => {
+	const { bidderId, prodId } = req.body
+	
+	const permissionInfo = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
+	const bidderAuctionInfo = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
+	const statusBidderList = await auctionStatusModel.findByProdId(prodId)
+
+	const checkBiggest = bidderAuctionInfo.find((item) => item.stt_is_biggest === 0)
+	const sortByNotBiggestPrice = statusBidderList.sort((a, b) => b.stt_biggest_price - a.stt_biggest_price).filter((item) => item.stt_is_biggest === 1 && item.stt_bidder_id !== bidderId)
+
+	if (permissionInfo.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Invalid Product Id Or Bidder Id`,
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	const updatePermission = {
+		per_can_auction: 1,
+		per_updated_date: presentDate
+	}
+
+	await auctionPermissionModel.update(permissionInfo[0].per_id, updatePermission)
+	
+	if (checkBiggest) {
+
+		let updateStatus = {
+			stt_is_biggest: 1,
+			stt_updated_date: presentDate
+		}
+
+		await auctionStatusModel.update(checkBiggest.stt_id, updateStatus)
+
+		updateStatus = {
+			stt_is_biggest: 0,
+			stt_updated_date: presentDate
+		}
+
+		await auctionStatusModel.update(sortByNotBiggestPrice[0].stt_id, updateStatus)
+	}
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
 module.exports = router

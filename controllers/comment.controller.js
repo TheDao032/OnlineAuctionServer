@@ -47,7 +47,7 @@ router.post('/new-comment', commentValidation.newComment, async (req, res) => {
     }
 
     await commentModel.create(commentInfo)
-    
+
     return res.status(200).json({
         statusCode: successCode
     })
@@ -97,6 +97,36 @@ router.post('/bad-comment', commentValidation.badComment, async (req, res) => {
     await commentModel.create(commentInfo)
     
     return res.status(200).json({
+        statusCode: successCode
+    })
+})
+
+router.get('/my-comment', async (req, res) => {
+
+    const { accId } = req.account
+
+    const commentInfo = await commentModel.findByToId(accId)
+
+    if (commentInfo.length === 0) {
+        return res.status(200).json({
+            listComments: [],
+            statusCode: successCode
+        })
+    }
+
+    const convertComment = commentInfo.map((element) => {
+        return {
+            cmtId: element.cmt_id,
+            cmtVote: element.cmt_vote,
+            cmtContent: element.cmt_content,
+            cmtFromId: element.cmt_from_id,
+            createDate: moment(element.cmt_created_date).format('YYYY-MM-DD HH:mm:ss'),
+            updateDate: moment(element.cmt_updated_date).format('YYYY-MM-DD HH:mm:ss')
+        }
+    })
+
+    return res.status(200).json({
+        listComments: convertComment,
         statusCode: successCode
     })
 })

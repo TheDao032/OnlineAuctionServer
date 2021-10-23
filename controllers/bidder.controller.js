@@ -52,7 +52,7 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 	const { prodId, aucPriceOffer } = req.body
 	const { accId } = req.account
 
-	const listVote = await commentModel.findByBidderId(accId)
+	const listVote = await commentModel.findByToId(accId)
 
 	if (listVote.length !== 0) {
 

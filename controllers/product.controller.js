@@ -10,6 +10,8 @@ const productImageModel = require('../models/productImage.model')
 const productDescriptionModel = require('../models/productDescription.model')
 const auctionModel = require('../models/auction.model')
 const accountModel = require('../models/account.model')
+const auctionStatusModel = require('../models/auctionStatus.model')
+const commentModel = require('../models/comment.model')
 
 const successCode = 0
 const errorCode = 1
@@ -97,8 +99,8 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 	const allAccount = await accountModel.findAll()
 	
 	const convertListProduct = allProducts.map((element) => {
-		const listBidderWithProd = listBidder.filter((item) => item.auc_is_biggest === 0)
-		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+		const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+		const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
 			return {
 				accId: item.acc_id,
 				accName: item.acc_name
@@ -113,7 +115,7 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
-			owner: accountInfo || [],
+			owner: accountInfo || null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -155,6 +157,8 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 router.get('/list-time-out', async (req, res) => {
 	const allProduct = await productModel.findAll()
 	const prodImages = await productImageModel.findAll()
+	const listBidder = await auctionModel.findAll()
+	const allAccount = await accountModel.findAll()
 
 	const listFilter = allProduct.filter((item) => {
 
@@ -177,7 +181,8 @@ router.get('/list-time-out', async (req, res) => {
 				}
 			})
 
-			const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+			const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+			const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
 					accName: item.acc_name
@@ -193,7 +198,7 @@ router.get('/list-time-out', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: accountInfo || [],
+				owner: accountInfo || null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -214,7 +219,8 @@ router.get('/list-time-out', async (req, res) => {
 			}
 		})
 
-		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+		const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+		const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
 			return {
 				accId: item.acc_id,
 				accName: item.acc_name
@@ -230,7 +236,7 @@ router.get('/list-time-out', async (req, res) => {
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
-			owner: accountInfo || [],
+			owner: accountInfo || null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -245,6 +251,8 @@ router.get('/list-time-out', async (req, res) => {
 router.get('/list-biggest-offer', async (req, res) => {
 	const allProduct = await productModel.findAll()
 	const prodImages = await productImageModel.findAll()
+	const listBidder = await auctionModel.findAll()
+	const allAccount = await accountModel.findAll()
 
 	const listFilter = allProduct.sort((a, b) => b.prod_offer_number - a.prod_offer_number)
 
@@ -257,7 +265,8 @@ router.get('/list-biggest-offer', async (req, res) => {
 			}
 		})
 
-		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+		const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+		const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
 			return {
 				accId: item.acc_id,
 				accName: item.acc_name
@@ -273,7 +282,7 @@ router.get('/list-biggest-offer', async (req, res) => {
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
-			owner: accountInfo || [],
+			owner: accountInfo || null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -288,6 +297,8 @@ router.get('/list-biggest-offer', async (req, res) => {
 router.get('/list-biggest-price', async (req, res) => {
 	const allProduct = await productModel.findAll()
 	const prodImages = await productImageModel.findAll()
+	const listBidder = await auctionModel.findAll()
+	const allAccount = await accountModel.findAll()
 
 	const listFilter = allProduct.sort((a, b) => b.prod_begin_price - a.prod_begin_price)
 
@@ -300,7 +311,8 @@ router.get('/list-biggest-price', async (req, res) => {
 			}
 		})
 
-		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+		const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+		const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
 			return {
 				accId: item.acc_id,
 				accName: item.acc_name
@@ -316,7 +328,7 @@ router.get('/list-biggest-price', async (req, res) => {
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
-			owner: accountInfo || [],
+			owner: accountInfo || null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -333,6 +345,8 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 	const { page, limit } = req.query
 
 	const listProduct = await productModel.findByCateId(cateId)
+	const listBidder = await auctionModel.findAll()
+	const allAccount = await accountModel.findAll()
 
 	const convertListProduct = listProduct.map((element) => {
 		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
@@ -343,7 +357,8 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 			}
 		})
 
-		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+		const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+		const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
 			return {
 				accId: item.acc_id,
 				accName: item.acc_name
@@ -359,7 +374,7 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
-			owner: accountInfo || [],
+			owner: accountInfo || null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -402,6 +417,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 	const productInfo = await productModel.findById(prodId)
 	const productImageList = await productImageModel.findByProdId(prodId)
 	const productDescriptionList = await productDescriptionModel.findByProdId(prodId)
+	const listBidder = await auctionModel.findAll()
+	const listComment = await commentModel.findAll()
 
 	if (productInfo.length === 0) {
 		return res.status(400).json({
@@ -410,10 +427,28 @@ router.post('/detail', productValidation.details, async (req, res) => {
 		})
 	}
 
-	const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+	const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+	const bidderInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((element) => {
+		const bidderGoodVote = listComment.filter((item) => item.cmt_to_id === element.acc_id && item.cmt_vote === 1)
+		const bidderBadVote = listComment.filter((item) => item.cmt_to_id === element.acc_id && item.cmt_vote === -1)
+
 		return {
 			accId: item.acc_id,
-			accName: item.acc_name
+			accName: item.acc_name,
+			accGoodVote: bidderGoodVote.length,
+			accBadVote: bidderBadVote.length
+		}
+	})
+
+	const sellerInfo = allAccount.find((item) => item.acc_id === prodInfo[0].prod_acc_id).map((element) => {
+		const bidderGoodVote = listComment.filter((item) => item.cmt_to_id === element.acc_id && item.cmt_vote === 1)
+		const bidderBadVote = listComment.filter((item) => item.cmt_to_id === element.acc_id && item.cmt_vote === -1)
+
+		return {
+			accId: item.acc_id,
+			accName: item.acc_name,
+			accGoodVote: bidderGoodVote.length,
+			accBadVote: bidderBadVote.length
 		}
 	})
 	
@@ -428,6 +463,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: productImageList,
 			prodDescription: productDescriptionList,
+			bidder: bidderInfo || null,
+			seller: sellerInfo || null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -457,6 +494,8 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 	const prodImages = await productImageModel.findAll()
 	const allProducts = await productModel.findAll()
 	const allCategories = await categoriesModel.findAll()
+	const listBidder = await auctionModel.findAll()
+	const allAccount = await accountModel.findAll()
 
 	let prodListInfo = await knex('tbl_product')
 							.whereRaw(`ts @@ to_tsquery('english', '${searchCondition}')`)
@@ -477,6 +516,14 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				}
 			})
 
+			const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && element.prod_id)
+			const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_name
+				}
+			})
+
 			return {
 				prodId: element.prod_id,
 				prodName: element.prod_name,
@@ -486,6 +533,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
+				owner: accountInfo || null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -554,6 +602,14 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					}
 				})
 
+				const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && element.prod_id)
+				const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
+					return {
+						accId: item.acc_id,
+						accName: item.acc_name
+					}
+				})
+
 				return {
 					prodId: element.prod_id,
 					prodName: element.prod_name,
@@ -563,6 +619,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					prodStepPrice: element.prod_step_price,
 					prodBuyPrice: element.prod_buy_price,
 					prodImages: prodImageInfo || [],
+					owner: accountInfo || null,
 					createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 					expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
