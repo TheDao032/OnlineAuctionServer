@@ -113,21 +113,21 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
-			owner: accountInfo,
+			owner: accountInfo || [],
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
 	})
 
 	
-	if (result) {
-		result[0].sort((a, b) => a - b)
+	if (convertListProduct) {
+		convertListProduct.sort((a, b) => a - b)
 		if (page && limit) {
 			let startIndex = (parseInt(page) - 1) * parseInt(limit)
 			let endIndex = (parseInt(page) * parseInt(limit))
-			let totalPage = Math.floor(result[0].length / parseInt(limit))
+			let totalPage = Math.floor(convertListProduct.length / parseInt(limit))
 
-			if (result[0].length % parseInt(limit) !== 0) {
+			if (convertListProduct.length % parseInt(limit) !== 0) {
 				totalPage = totalPage + 1
 			}
 	
@@ -177,6 +177,13 @@ router.get('/list-time-out', async (req, res) => {
 				}
 			})
 
+			const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_name
+				}
+			})
+
 			return {
 				prodId: element.prod_id,
 				prodName: element.prod_name,
@@ -186,6 +193,7 @@ router.get('/list-time-out', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
+				owner: accountInfo || [],
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -206,6 +214,13 @@ router.get('/list-time-out', async (req, res) => {
 			}
 		})
 
+		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+			return {
+				accId: item.acc_id,
+				accName: item.acc_name
+			}
+		})
+
 		return {
 			prodId: element.prod_id,
 			prodName: element.prod_name,
@@ -215,6 +230,7 @@ router.get('/list-time-out', async (req, res) => {
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
+			owner: accountInfo || [],
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -241,6 +257,13 @@ router.get('/list-biggest-offer', async (req, res) => {
 			}
 		})
 
+		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+			return {
+				accId: item.acc_id,
+				accName: item.acc_name
+			}
+		})
+
 		return {
 			prodId: element.prod_id,
 			prodName: element.prod_name,
@@ -250,6 +273,7 @@ router.get('/list-biggest-offer', async (req, res) => {
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
+			owner: accountInfo || [],
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -276,6 +300,13 @@ router.get('/list-biggest-price', async (req, res) => {
 			}
 		})
 
+		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+			return {
+				accId: item.acc_id,
+				accName: item.acc_name
+			}
+		})
+
 		return {
 			prodId: element.prod_id,
 			prodName: element.prod_name,
@@ -285,6 +316,7 @@ router.get('/list-biggest-price', async (req, res) => {
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
+			owner: accountInfo || [],
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
@@ -302,17 +334,48 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 
 	const listProduct = await productModel.findByCateId(cateId)
 
-	if (listProduct.length > 0) {
+	const convertListProduct = listProduct.map((element) => {
+		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+			return {
+				prodImgId: info.prod_img_id,
+				prodImgProductId: info.prod_img_product_id,
+				prodImgData: info.prod_img_data
+			}
+		})
+
+		const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+			return {
+				accId: item.acc_id,
+				accName: item.acc_name
+			}
+		})
+
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			prodImages: prodImageInfo || [],
+			owner: accountInfo || [],
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+		}
+	})
+
+	if (convertListProduct.length > 0) {
 		if (page && limit) {
 			let startIndex = (parseInt(page) - 1) * parseInt(limit)
 			let endIndex = (parseInt(page) * parseInt(limit))
-			let totalPage = Math.floor(listProduct.length / parseInt(limit))
+			let totalPage = Math.floor(convertListProduct.length / parseInt(limit))
 	
-			if (listProduct.length % parseInt(limit) !== 0) {
+			if (convertListProduct.length % parseInt(limit) !== 0) {
 				totalPage = totalPage + 1
 			}
 	
-			const paginationResult = listProduct.slice(startIndex, endIndex)
+			const paginationResult = convertListProduct.slice(startIndex, endIndex)
 	
 			return res.status(200).json({
 				totalPage,
@@ -322,7 +385,7 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 		}
 		
 		return res.status(200).json({
-			listProducts: listProduct,
+			listProducts: convertListProduct,
 			statusCode: successCode
 		})
 	}
@@ -346,6 +409,13 @@ router.post('/detail', productValidation.details, async (req, res) => {
 			statusCode: 1
 		})
 	}
+
+	const accountInfo = allAccount.find((item) => item.acc_id === listBidderWithProd[0].auc_bidder_id).map((item) => {
+		return {
+			accId: item.acc_id,
+			accName: item.acc_name
+		}
+	})
 	
 	const result = productInfo.map((element) => {
 		return {
