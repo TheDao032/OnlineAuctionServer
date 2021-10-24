@@ -35,7 +35,7 @@ const findByProdId = async (prodId) => {
     return info
 }
 
-const findByProdId = async (prodId, ts) => {
+const findByProdIdWithTs = async (prodId, ts) => {
     const mt = moment.unix(ts)
 
     const formatTs = mt.format('YYYY-MM-DD HH:mm:ss')
@@ -86,5 +86,6 @@ module.exports = {
     del,
 	findByBidderAndProduct,
 	updateWithBidderAndProd,
-    updateWithProdId
+    updateWithProdId,
+    findByProdIdWithTs
 }

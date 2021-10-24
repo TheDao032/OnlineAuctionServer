@@ -190,7 +190,6 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 		})
 	}
 
-	const prodInfo = await productModel.findById(prodId)
 	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(accId, prodId)
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 

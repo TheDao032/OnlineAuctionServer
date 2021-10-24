@@ -25,7 +25,7 @@ router.post('/list-auction', productValidation.queryInfo, async (req, res) => {
 	const ts = req.query.ts || 0
 
 	const fn = async () => {
-		const listBidder = await auctionStatusModel.findByProdId(prodId, ts).map((item) => {
+		const listBidder = await auctionStatusModel.findByProdIdWithTs(prodId, ts).map((item) => {
 			return {
 				sttId: item.stt_id,
 				sttBidderId: item.stt_bidder_id,
