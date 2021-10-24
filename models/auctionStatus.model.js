@@ -1,4 +1,5 @@
 const knex = require('../utils/dbConnection')
+const moment = require('moment')
 
 const findById = async (sttId) => {
     const info = await knex('tbl_auction_status')
@@ -30,6 +31,17 @@ const findByBidderAndProduct = async (bidderId, prodId) => {
 const findByProdId = async (prodId) => {
     const info = await knex('tbl_auction_status')
                     .where({ stt_prod_id: prodId })
+
+    return info
+}
+
+const findByProdId = async (prodId, ts) => {
+    const mt = moment.unix(ts)
+
+    const formatTs = mt.format('YYYY-MM-DD HH:mm:ss')
+    const info = await knex('tbl_auction_status')
+                    .where({ stt_prod_id: prodId })
+                    .andWhere('stt_created_date', '>=', formatTs)
 
     return info
 }
