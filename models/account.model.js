@@ -31,6 +31,13 @@ const findById = async (id) => {
 	return info
 }
 
+const findUpgradeSeller = async () => {
+	const info =  await knex('tbl_account')
+		.where({ acc_upgrade_status: 0 })
+
+	return info
+}
+
 const updateRefreshToken = async (accId, refreshToken) => {
 	await knex('tbl_account')
 		.where({ acc_id: accId })
@@ -60,5 +67,6 @@ module.exports = {
 	updateRefreshToken,
 	isValidRefreshToken,
 	update,
+	findUpgradeSeller,
 	accountStatus
 }

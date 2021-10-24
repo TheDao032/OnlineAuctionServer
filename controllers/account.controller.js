@@ -379,4 +379,78 @@ router.post('/update-status', accountValidation.updateStatusAccount, async (req,
 	})
 })
 
+router.post('/seller-permission', async (req, res) => {
+	const presentRole = req.account.accRole
+	const { accId } = req.account
+
+	if (!roleModel.checkBidderRole(presentRole)) {
+		return res.status(400).json({
+			statusCode: errorCode,
+			errorMessage: `Permission Access Denied`
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+	const accountInfo = {
+		acc_upgrade_status: 0,
+		acc_updated_date: presentDate
+	}
+
+	await accountModel.update(accId, accountInfo)
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
+router.post('/accept-upgrade-seller', accountValidation.upgradeRoleAccount, async (req, res) => {
+	const { accId } = req.body
+	const presentRole = req.account.accRole
+
+	if (!roleModel.checkBidderRole(presentRole)) {
+		return res.status(400).json({
+			statusCode: errorCode,
+			errorMessage: `Permission Access Denied`
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+	const accountInfo = {
+		acc_role: `SEL`,
+		acc_upgrade_status: 1,
+		acc_updated_date: presentDate
+	}
+
+	await accountModel.update(accId, accountInfo)
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
+router.get('/list-upgrade-seller',  async (req, res) => {
+	const presentRole = req.account.accRole
+
+	if (!roleModel.checkAdminRole(presentRole)) {
+		return res.status(400).json({
+			statusCode: errorCode,
+			errorMessage: `Permission Access Denied`
+		})
+	}
+	
+	const listUpgradeSeller = await accountModel.update(accId, accountInfo)
+
+	if (listUpgradeSeller.length === 0) {
+		return res.status(200).json({
+			listUpgradeSeller: [],
+			statusCode: successCode
+		})
+	}
+
+	return res.status(200).json({
+		listUpgradeSeller,
+		statusCode: successCode
+	})
+})
+
 module.exports = router

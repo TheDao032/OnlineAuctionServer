@@ -12,10 +12,14 @@ const productDescriptionModel = require('../models/productDescription.model')
 const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
 const auctionPermissionModel = require('../models/auctionPermission.model')
+const accountModel = require('../models/account.model')
 
 const sellerValidation = require('../middlewares/validation/seller.validate')
 const productValidation = require('../middlewares/validation/product.validate')
 const auctionValidation = require('../middlewares/validation/auction.validate')
+
+const mailService = require('../services/mailService')
+const mailOptions = require('../template/mailOptions')
 
 const successCode = 0
 const errorCode = 1
@@ -653,6 +657,8 @@ router.post('/take-permission', sellerValidation.givePermission, async (req, res
 	const permissionInfo = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
 	const bidderAuctionInfo = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
 	const statusBidderList = await auctionStatusModel.findByProdId(prodId)
+	const accountInfo = await accountModel.findById(bidderId)
+	const productInfo = await productModel.findById(prodId)
 
 	const checkBiggest = bidderAuctionInfo.find((item) => item.stt_is_biggest === 0)
 	const sortByNotBiggestPrice = statusBidderList.sort((a, b) => b.stt_biggest_price - a.stt_biggest_price).filter((item) => item.stt_is_biggest === 1 && item.stt_bidder_id !== bidderId)
@@ -689,6 +695,8 @@ router.post('/take-permission', sellerValidation.givePermission, async (req, res
 
 		await auctionStatusModel.update(sortByNotBiggestPrice[0].stt_id, updateStatus)
 	}
+
+	await mailService.sendMail(mailOptions.takePermissionOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, productInfo[0].prod_name), req, res)
 
 	return res.status(200).json({
 		statusCode: successCode
