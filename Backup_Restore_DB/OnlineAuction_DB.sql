@@ -48,6 +48,7 @@ CREATE TABLE public.tbl_account (
     acc_role character varying(5),
     acc_avatar text,
     acc_status integer DEFAULT 2,
+    acc_upgrade_status integer,
     acc_token_forgot character varying(100),
     acc_refresh_token character varying(100),
     acc_created_date timestamp without time zone,

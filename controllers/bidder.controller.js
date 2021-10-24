@@ -13,10 +13,14 @@ const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
 const commentModel = require('../models/comment.model')
 const auctionPermissionModel = require('../models/auctionPermission.model')
+const accountModel = require('../models/account.model')
 
 const productValidation = require('../middlewares/validation/product.validate')
 const auctionValidation = require('../middlewares/validation/auction.validate')
 const auctionStatusValidation = require('../middlewares/validation/auctionStatus.validate')
+
+const mailService = require('../services/mailService')
+const mailOptions = require('../template/mailOptions')
 
 const successCode = 0
 const errorCode = 1
@@ -53,6 +57,10 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 	const { accId } = req.account
 
 	const listVote = await commentModel.findByToId(accId)
+	const accountInfo = await accountModel.findById(accId)
+
+	const prodInfo = await productModel.findById(prodId)
+	const sellerInfo = await accountModel.findById(prodInfo[0].prod_acc_id)
 
 	if (listVote.length !== 0) {
 
@@ -61,7 +69,6 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 		if (checkPositive.length * 100 / parseFloat(listVote.length) > 80) {
 
 			const listBidder = await auctionStatusModel.findByProdId(prodId)
-			const prodInfo = await productModel.findById(prodId)
 
 			if (prodInfo.length === 0) {
 				return res.status(200).json({
@@ -102,6 +109,10 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 
 					await productModel.update(productInfo, prodInfo[0].prod_id)
 
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
 					return res.status(200).json({
 						statusCode: successCode
 					})
@@ -120,6 +131,8 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 
 			if ((biggestBidder.stt_biggest_price + prodInfo[0].prod_step_price) <= aucPriceOffer) {
 				if (sortByOfferPrice[0].auc_price_offer < aucPriceOffer) {
+					const lastBiggest = await accountModel.findById(biggestBidder.stt_bidder_id)
+
 					const updateBiggest = {
 						stt_is_biggest: 1,
 						stt_updated_date: presentDate
@@ -146,6 +159,13 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 						auc_updated_date: presentDate
 					}
 					await auctionModel.create(auctionInfo)
+
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					await mailService.sendMail(mailOptions.offerSuccessOptions(lastBiggest[0].acc_email, lastBiggest[0].acc_email, prodInfo[0].prod_name), req, res)
+
 				} else {
 					return res.status(400).json({
 						errorMessage: `Someone's'Money Offering Is Bigger Than Your`,
@@ -170,7 +190,6 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 		})
 	}
 
-	const prodInfo = await productModel.findById(prodId)
 	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(accId, prodId)
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
@@ -231,6 +250,10 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 
 					await productModel.update(productInfo, prodInfo[0].prod_id)
 
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
 					return res.status(200).json({
 						statusCode: successCode
 					})
@@ -275,6 +298,13 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 						auc_updated_date: presentDate
 					}
 					await auctionModel.create(auctionInfo)
+
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					await mailService.sendMail(mailOptions.offerSuccessOptions(lastBiggest[0].acc_email, lastBiggest[0].acc_email, prodInfo[0].prod_name), req, res)
+
 				} else {
 					return res.status(400).json({
 						errorMessage: `Someone's'Money Offering Is Bigger Than Your`,

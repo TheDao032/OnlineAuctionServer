@@ -6,7 +6,7 @@ const updateAccountPassword = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-		  accId: { type: 'string', pattern: '^\\d+$' },
+		  accId: { type: 'integer' },
 		  accOldPassword: { type: 'string', pattern: '' },
 		  accNewPassword: { type: 'string', pattern: '', minLength: 1 },
 		  accConfirmPassword: { type: 'string', pattern: '', minLength: 1 },
@@ -36,7 +36,7 @@ const updateRoleAccount = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-			accId: { type: 'string', pattern: '^\\d+$' },
+			accId: { type: 'integer' },
 			accRole: { type: 'string', pattern: '' , maxLength: 5 },
   		},
 		required: ['accId' , 'accRole'],
@@ -64,7 +64,7 @@ const updateAccount = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-			accId: { type: 'string', pattern: '^\\d+$' },
+			accId: { type: 'integer' },
     		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
     		accPhoneNumber: { type: 'string', pattern: '', maxLength: 15 },
     		accRole: { type: 'string', pattern: '', maxLength: 5 }
@@ -94,7 +94,7 @@ const avatar = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		accId: { type: 'string', pattern: '^\\d+$' },
+    		accId: { type: 'integer' },
   		},
 		required: ['accId'],
 		additionalProperties: true
@@ -121,7 +121,7 @@ const detailInfo = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		accId: { type: 'string', pattern: '^\\d+$' }
+    		accId: { type: 'integer' }
   		},
 		required: [],
 		additionalProperties: true
@@ -148,7 +148,7 @@ const deleteAccount = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		accId: { type: 'string', pattern: '^\\d+$' }
+    		accId: { type: 'integer' }
   		},
 		required: ['accId'],
 		additionalProperties: true
@@ -227,6 +227,33 @@ const updateStatusAccount = (req, res, next) => {
 	next()
 }
 
+const upgradeRoleAccount = (req, res, next) => {
+	const shema = {
+  		type: 'object',
+  		properties: {
+			accId: { type: 'integer' }
+  		},
+		required: ['accId'],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
+
+	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
 module.exports = {
 	updateAccountPassword,
 	updateRoleAccount,
@@ -235,5 +262,6 @@ module.exports = {
 	detailInfo,
 	queryInfo,
 	deleteAccount,
-	updateStatusAccount
+	updateStatusAccount,
+	upgradeRoleAccount
 }

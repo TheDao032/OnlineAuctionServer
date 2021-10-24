@@ -12,7 +12,23 @@ const checkAdminRole = async (roleId) => {
 	return false
 }
 
+const checkSellerRole = async (roleId) => {
+	if (roleId === 'SEL') {
+		return true
+	}
+	return false
+}
+
+const checkBidderRole = async (roleId) => {
+	if (roleId === 'BID') {
+		return true
+	}
+	return false
+}
+
 module.exports = {
 	findById,
-	checkAdminRole
+	checkAdminRole,
+	checkSellerRole,
+	checkBidderRole
 }
