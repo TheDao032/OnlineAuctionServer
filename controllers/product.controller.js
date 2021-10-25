@@ -536,11 +536,14 @@ router.post('/detail', productValidation.details, async (req, res) => {
 
 		return {
 			accId: element.acc_id,
-			accName: element.acc_name,
+			accName: element.acc_name || '',
+			accEmail: element.acc_email,
 			accGoodVote: bidderGoodVote.length || 0,
 			accBadVote: bidderBadVote.length || 0
 		}
 	})
+
+	console.log(sellerInfo)
 
 	const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
 
@@ -551,7 +554,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 	
 			return {
 				accId: element.acc_id,
-				accName: element.acc_name,
+				accName: element.acc_name || '',
+				accEmail: element.acc_email,
 				accGoodVote: bidderGoodVote.length || 0,
 				accBadVote: bidderBadVote.length || 0
 			}
@@ -600,6 +604,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
 	})
+
+	// console.log(result)
 
 	return res.status(200).json({
 		productDetail: result,
