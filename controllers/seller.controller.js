@@ -514,7 +514,7 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
 	
 })
 
-router.get('/bought-product', productValidation.queryInfo, async (req, res) => {
+router.get('/list-bought-product', productValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
     const { accId } = req.account
 

@@ -19,7 +19,7 @@ const auctionStatusValidation = require('../middlewares/validation/auctionStatus
 const successCode = 0
 const errorCode = 1
 
-router.post('/list-auction', productValidation.queryInfo, async (req, res) => {
+router.post('/list-auction', auctionValidation.listAuction, async (req, res) => {
     const { prodId } = req.body
 	const { page, limit } = req.query
 	const ts = req.query.ts || 0
