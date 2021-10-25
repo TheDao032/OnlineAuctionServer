@@ -24,17 +24,22 @@ router.post('/list-auction', auctionValidation.listAuction, async (req, res) => 
 	const { page, limit } = req.query
 	const ts = req.query.ts || 0
 
+	const listProduct = await productModel.findAll()
+
 	let loop = 0
 
 	const fn = async () => {
 		const listBidder = await auctionStatusModel.findByProdIdWithTs(prodId, ts)
 		
 		if (listBidder.length !== 0) {
-			const convertListBidder = listBidder.map((item) => {
+			const convertListBidder = listBidder.map((element) => {
+				const prodInfo = listProduct.find((item) => item.prod_id === element.stt_prod_id)
 				return {
-					sttId: item.stt_id,
-					sttBidderId: item.stt_bidder_id,
-					sttBiggestPrice: item.stt_biggest_price
+					sttId: element.stt_id,
+					sttProdName: prodInfo.prod_name,
+					sttProdId: element.stt_prod_id,
+					sttBidderId: element.stt_bidder_id,
+					sttBiggestPrice: element.stt_biggest_price
 				}
 			})
 			convertListBidder.sort((a, b) => a.sttBiggestPrice - b.sttBiggestPrice)
@@ -51,27 +56,25 @@ router.post('/list-auction', auctionValidation.listAuction, async (req, res) => 
 		
 				return res.status(200).json({
 					totalPage,
-					listProducts: paginationResult,
+					listAuctions: paginationResult,
 					return_ts: moment().unix(),
 					statusCode: successCode
 				})
 			}
 			
-			console.log()
 			return res.status(200).json({
-				listProducts: convertListBidder,
+				listAuctions: convertListBidder,
 				return_ts: moment().unix(),
 				statusCode: successCode
 			})
 		} else {
 			loop++;
 
-			console.log(loop)
 			if (loop < 4) {
 				setTimeout(fn, 5000)
 			} else {
 				return res.status(200).json({
-					listProducts: [],
+					listAuctions: [],
 					return_ts: moment().unix(),
 					statusCode: successCode
 				})
