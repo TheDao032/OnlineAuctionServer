@@ -104,7 +104,8 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
-					accName: item.acc_name
+					accName: item.acc_full_name,
+					accEmail: item.acc_email
 				}
 			})
 	
@@ -202,6 +203,7 @@ router.get('/list-time-out', async (req, res) => {
 				const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 					return {
 						accId: item.acc_id,
+						accName: item.acc_full_name,
 						accEmail: item.acc_email
 					}
 				})
@@ -257,6 +259,7 @@ router.get('/list-time-out', async (req, res) => {
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
+					accName: item.acc_full_name,
 					accEmail: item.acc_email
 				}
 			})
@@ -321,6 +324,7 @@ router.get('/list-biggest-offer', async (req, res) => {
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
+					accName: item.acc_full_name,
 					accEmail: item.acc_email
 				}
 			})
@@ -385,6 +389,7 @@ router.get('/list-biggest-price', async (req, res) => {
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
+					accName: item.acc_full_name,
 					accEmail: item.acc_email
 				}
 			})
@@ -448,6 +453,7 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
+					accName: item.acc_full_name,
 					accEmail: item.acc_email
 				}
 			})
@@ -536,7 +542,7 @@ router.post('/detail', productValidation.details, async (req, res) => {
 
 		return {
 			accId: element.acc_id,
-			accName: element.acc_name || '',
+			accName: element.acc_full_name || '',
 			accEmail: element.acc_email,
 			accGoodVote: bidderGoodVote.length || 0,
 			accBadVote: bidderBadVote.length || 0
@@ -554,7 +560,7 @@ router.post('/detail', productValidation.details, async (req, res) => {
 	
 			return {
 				accId: element.acc_id,
-				accName: element.acc_name || '',
+				accName: element.acc_full_name || '',
 				accEmail: element.acc_email,
 				accGoodVote: bidderGoodVote.length || 0,
 				accBadVote: bidderBadVote.length || 0
@@ -658,6 +664,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 					return {
 						accId: item.acc_id,
+						accName: item.acc_full_name,
 						accEmail: item.acc_email
 					}
 				})
@@ -760,6 +767,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 						return {
 							accId: item.acc_id,
+							accName: item.acc_full_name,
 							accEmail: item.acc_email
 						}
 					})
