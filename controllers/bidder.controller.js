@@ -290,6 +290,8 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 			if ((biggestBidder.stt_biggest_price + prodInfo[0].prod_step_price) <= aucPriceOffer) {
 				if (sortByOfferPrice[0].auc_price_offer < aucPriceOffer) {
+					const lastBiggest = await accountModel.findById(biggestBidder.stt_bidder_id)
+					
 					const updateBiggest = {
 						stt_is_biggest: 1,
 						stt_updated_date: presentDate

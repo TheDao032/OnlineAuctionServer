@@ -24,47 +24,62 @@ router.post('/list-auction', auctionValidation.listAuction, async (req, res) => 
 	const { page, limit } = req.query
 	const ts = req.query.ts || 0
 
+	let loop = 0
+
 	const fn = async () => {
-		const listBidder = await auctionStatusModel.findByProdIdWithTs(prodId, ts).map((item) => {
-			return {
-				sttId: item.stt_id,
-				sttBidderId: item.stt_bidder_id,
-				sttBiggestPrice: stt_biggest_price
-			}
-		})
+		const listBidder = await auctionStatusModel.findByProdIdWithTs(prodId, ts)
 		
 		if (listBidder.length !== 0) {
-			listBidder[0].sort((a, b) => a.sttBiggestPrice - b.sttBiggestPrice)
+			const convertListBidder = listBidder.map((item) => {
+				return {
+					sttId: item.stt_id,
+					sttBidderId: item.stt_bidder_id,
+					sttBiggestPrice: item.stt_biggest_price
+				}
+			})
+			convertListBidder.sort((a, b) => a.sttBiggestPrice - b.sttBiggestPrice)
 			if (page && limit) {
 				let startIndex = (parseInt(page) - 1) * parseInt(limit)
 				let endIndex = (parseInt(page) * parseInt(limit))
-				let totalPage = Math.floor(listBidder[0].length / parseInt(limit))
+				let totalPage = Math.floor(convertListBidder.length / parseInt(limit))
 
-				if (listBidder[0].length % parseInt(limit) !== 0) {
+				if (convertListBidder.length % parseInt(limit) !== 0) {
 					totalPage = totalPage + 1
 				}
 		
-				const paginationResult = listBidder[0].slice(startIndex, endIndex)
+				const paginationResult = convertListBidder.slice(startIndex, endIndex)
 		
 				return res.status(200).json({
 					totalPage,
 					listProducts: paginationResult,
-					ts: moment.unix(),
+					return_ts: moment().unix(),
 					statusCode: successCode
 				})
 			}
 			
+			console.log()
 			return res.status(200).json({
-				listProducts: listBidder[0],
-				ts: moment.unix(),
+				listProducts: convertListBidder,
+				return_ts: moment().unix(),
 				statusCode: successCode
 			})
 		} else {
-			setTimeout(fn, 300000)
-		}
+			loop++;
 
-		await fn()
+			console.log(loop)
+			if (loop < 4) {
+				setTimeout(fn, 5000)
+			} else {
+				return res.status(200).json({
+					listProducts: [],
+					return_ts: moment().unix(),
+					statusCode: successCode
+				})
+			}
+		}
 	}
+
+	await fn()
 })
 
 module.exports = router
