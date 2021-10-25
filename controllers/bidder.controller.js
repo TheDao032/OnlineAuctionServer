@@ -18,6 +18,7 @@ const accountModel = require('../models/account.model')
 const productValidation = require('../middlewares/validation/product.validate')
 const auctionValidation = require('../middlewares/validation/auction.validate')
 const auctionStatusValidation = require('../middlewares/validation/auctionStatus.validate')
+const bidderValidation = require('../middlewares/validation/bidder.validate')
 
 const mailService = require('../services/mailService')
 const mailOptions = require('../template/mailOptions')
@@ -25,7 +26,7 @@ const mailOptions = require('../template/mailOptions')
 const successCode = 0
 const errorCode = 1
 
-router.post('/cancel', auctionStatusValidation.cancle, async (req, res) => {
+router.post('/cancel', bidderValidation.cancel, async (req, res) => {
 	const { prodId } = req.body
 	const { accId } = req.account
 
@@ -69,7 +70,7 @@ router.post('/cancel', auctionStatusValidation.cancle, async (req, res) => {
 	})
 })
 
-router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
+router.post('/offer', bidderValidation.offer, async (req, res) => {
 	const { prodId, aucPriceOffer } = req.body
 	const { accId } = req.account
 

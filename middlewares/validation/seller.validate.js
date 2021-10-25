@@ -38,7 +38,7 @@ const updateProduct = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			prodId: { type: 'string', pattern: '^\\d+$' },
+			prodId: { type: 'integer' },
 			prodName: { type: 'string', maxLength: 60 },
 			prodCateId: { type: 'string', pattern: '^\\d+$' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
@@ -124,7 +124,7 @@ const updateDescription = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			prodId: { type: 'string', pattern: '^\\d+$' },
+			prodId: { type: 'integer' },
 			prodDescription: { type: 'string', minLength: 1 }
 		},
 		required: ['prodId', 'prodDescription'],

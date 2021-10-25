@@ -8,7 +8,7 @@ const listAuction = (req, res, next) => {
   		properties: {
     		prodId: { type: 'integer' }
   		},
-		required: [],
+		required: ['prodId'],
 		additionalProperties: true
     }
 
@@ -36,7 +36,7 @@ const listAuction = (req, res, next) => {
 		})
 	}
 
-    const validatorBody = ajv.compile(shemaQuery)
+    const validatorBody = ajv.compile(shemaBody)
 	const validBody = validatorBody(req.body)
 
 	if (!validBody) {
