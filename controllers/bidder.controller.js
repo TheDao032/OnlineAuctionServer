@@ -25,11 +25,13 @@ const mailOptions = require('../template/mailOptions')
 const successCode = 0
 const errorCode = 1
 
-router.post('/cancle', auctionStatusValidation.cancle, async (req, res) => {
+router.post('/cancel', auctionStatusValidation.cancle, async (req, res) => {
 	const { prodId } = req.body
 	const { accId } = req.account
 
 	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(accId, prodId)
+	const productInfo = await productModel.findById(prodId)
+	const checkBiggest = checkBidderAuctionExist.find((item) => item.stt_is_biggest === 0)
 
 	if (checkBidderAuctionExist.length === 0) {
 		return res.status(400).json({
@@ -47,6 +49,21 @@ router.post('/cancle', auctionStatusValidation.cancle, async (req, res) => {
 
 	await auctionStatusModel.update(checkBidderAuctionExist[0].stt_id, auctionStatusInfo)
 	
+	if (moment(productInfo[0].prod_expired_date) <= moment()) {
+		if (checkBiggest) {
+			const commentInfo = {
+				cmt_to_id: accId,
+				cmt_from_id: productInfo[0].prod_acc_id,
+				cmt_vote: -1,
+				cmt_content: 'Khách Hàng Không Thanh Toán',
+				cmt_created_date: presentDate,
+				cmt_updated_date: presentDate
+			}
+		
+			await commentModel.create(commentInfo)
+		}
+	}
+
 	return res.status(200).json({
 		statusCode: successCode
 	})
