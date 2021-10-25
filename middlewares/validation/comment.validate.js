@@ -33,12 +33,12 @@ const newComment = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			bidderId: { type: 'integer' },
+			toId: { type: 'integer' },
 			prodId: { type: 'integer' },
 			cmtContent: { type: 'string', pattern: '' , maxLength: 200 },
 			cmtVote: { type: 'integer' }
 		},
-		required: ['prodId', 'bidderId', 'cmtContent', 'cmtVote'],
+		required: ['prodId', 'toId', 'cmtContent', 'cmtVote'],
 		additionalProperties: true
 	}
 

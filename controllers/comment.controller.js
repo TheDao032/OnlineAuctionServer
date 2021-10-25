@@ -53,53 +53,53 @@ router.post('/new-comment', commentValidation.newComment, async (req, res) => {
     })
 })
 
-router.post('/bad-comment', commentValidation.badComment, async (req, res) => {
-    const { toId, prodId, fromId } = req.body
+// router.post('/bad-comment', commentValidation.badComment, async (req, res) => {
+//     const { toId, prodId, fromId } = req.body
 
-    const checkBidderExist = await accountModel.findById(toId)
+//     const checkBidderExist = await accountModel.findById(toId)
 
-    if (checkBidderExist.length === 0) {
-        return res.status(400).json({
-            errorMessage: `Invalid Bidder Id`,
-            statusCode: errorCode
-        })
-    }
+//     if (checkBidderExist.length === 0) {
+//         return res.status(400).json({
+//             errorMessage: `Invalid Bidder Id`,
+//             statusCode: errorCode
+//         })
+//     }
 
-    const checkSellerExist = await accountModel.findById(fromId)
+//     const checkSellerExist = await accountModel.findById(fromId)
 
-    if (checkSellerExist.length === 0) {
-        return res.status(400).json({
-            errorMessage: `Invalid Bidder Id`,
-            statusCode: errorCode
-        })
-    }
+//     if (checkSellerExist.length === 0) {
+//         return res.status(400).json({
+//             errorMessage: `Invalid Bidder Id`,
+//             statusCode: errorCode
+//         })
+//     }
 
-    const checkProductExist = await productModel.findById(prodId)
+//     const checkProductExist = await productModel.findById(prodId)
 
-    if (checkProductExist.length === 0) {
-        return res.status(400).json({
-            errorMessage: `Invalid Product Id`,
-            statusCode: errorCode
-        })
-    }
+//     if (checkProductExist.length === 0) {
+//         return res.status(400).json({
+//             errorMessage: `Invalid Product Id`,
+//             statusCode: errorCode
+//         })
+//     }
     
-    const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+//     const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-    const commentInfo = {
-        cmt_to_id: toId,
-        cmt_from_id: fromId,
-        cmt_vote: -1,
-		cmt_content: 'Khách Hàng Không Thanh Toán',
-        cmt_created_date: presentDate,
-        cmt_updated_date: presentDate
-    }
+//     const commentInfo = {
+//         cmt_to_id: toId,
+//         cmt_from_id: fromId,
+//         cmt_vote: -1,
+// 		cmt_content: 'Khách Hàng Không Thanh Toán',
+//         cmt_created_date: presentDate,
+//         cmt_updated_date: presentDate
+//     }
 
-    await commentModel.create(commentInfo)
+//     await commentModel.create(commentInfo)
     
-    return res.status(200).json({
-        statusCode: successCode
-    })
-})
+//     return res.status(200).json({
+//         statusCode: successCode
+//     })
+// })
 
 router.get('/my-comment', async (req, res) => {
 

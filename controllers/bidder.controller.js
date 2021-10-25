@@ -18,6 +18,7 @@ const accountModel = require('../models/account.model')
 const productValidation = require('../middlewares/validation/product.validate')
 const auctionValidation = require('../middlewares/validation/auction.validate')
 const auctionStatusValidation = require('../middlewares/validation/auctionStatus.validate')
+const bidderValidation = require('../middlewares/validation/bidder.validate')
 
 const mailService = require('../services/mailService')
 const mailOptions = require('../template/mailOptions')
@@ -25,11 +26,13 @@ const mailOptions = require('../template/mailOptions')
 const successCode = 0
 const errorCode = 1
 
-router.post('/cancle', auctionStatusValidation.cancle, async (req, res) => {
+router.post('/cancel', bidderValidation.cancel, async (req, res) => {
 	const { prodId } = req.body
 	const { accId } = req.account
 
 	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(accId, prodId)
+	const productInfo = await productModel.findById(prodId)
+	const checkBiggest = checkBidderAuctionExist.find((item) => item.stt_is_biggest === 0)
 
 	if (checkBidderAuctionExist.length === 0) {
 		return res.status(400).json({
@@ -47,12 +50,27 @@ router.post('/cancle', auctionStatusValidation.cancle, async (req, res) => {
 
 	await auctionStatusModel.update(checkBidderAuctionExist[0].stt_id, auctionStatusInfo)
 	
+	if (moment(productInfo[0].prod_expired_date) <= moment()) {
+		if (checkBiggest) {
+			const commentInfo = {
+				cmt_to_id: accId,
+				cmt_from_id: productInfo[0].prod_acc_id,
+				cmt_vote: -1,
+				cmt_content: 'Khách Hàng Không Thanh Toán',
+				cmt_created_date: presentDate,
+				cmt_updated_date: presentDate
+			}
+		
+			await commentModel.create(commentInfo)
+		}
+	}
+
 	return res.status(200).json({
 		statusCode: successCode
 	})
 })
 
-router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
+router.post('/offer', bidderValidation.offer, async (req, res) => {
 	const { prodId, aucPriceOffer } = req.body
 	const { accId } = req.account
 
@@ -272,6 +290,8 @@ router.post('/offer', auctionStatusValidation.offer, async (req, res) => {
 
 			if ((biggestBidder.stt_biggest_price + prodInfo[0].prod_step_price) <= aucPriceOffer) {
 				if (sortByOfferPrice[0].auc_price_offer < aucPriceOffer) {
+					const lastBiggest = await accountModel.findById(biggestBidder.stt_bidder_id)
+					
 					const updateBiggest = {
 						stt_is_biggest: 1,
 						stt_updated_date: presentDate
