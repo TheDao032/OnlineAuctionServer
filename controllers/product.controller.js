@@ -95,17 +95,33 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 
 	const allProducts = await productModel.findAll()
-	const listBidder = await auctionModel.findAll()
+	const listBidder = await auctionStatusModel.findAll()
 	const allAccount = await accountModel.findAll()
 	
 	const convertListProduct = allProducts.map((element) => {
-		const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
-		const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
+		const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
+		if (biggestBidder) {
+			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_full_name,
+					accEmail: item.acc_email
+				}
+			})
+	
 			return {
-				accId: item.acc_id,
-				accName: item.acc_name
+				prodId: element.prod_id,
+				prodName: element.prod_name,
+				prodCateId: element.prod_cate_id,
+				prodOfferNumber: element.prod_offer_number,
+				prodBeginPrice: element.prod_begin_price,
+				prodStepPrice: element.prod_step_price,
+				prodBuyPrice: element.prod_buy_price,
+				owner: accountInfo || null,
+				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
-		})
+		}
 
 		return {
 			prodId: element.prod_id,
@@ -115,10 +131,11 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
-			owner: accountInfo || null,
+			owner: null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
+		
 	})
 
 	
@@ -133,7 +150,7 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 				totalPage = totalPage + 1
 			}
 	
-			const paginationResult = result[0].slice(startIndex, endIndex)
+			const paginationResult = convertListProduct.slice(startIndex, endIndex)
 	
 			return res.status(200).json({
 				totalPage,
@@ -143,7 +160,7 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 		}
 		
 		return res.status(200).json({
-			listProducts: result[0],
+			listProducts: convertListProduct,
 			statusCode: successCode
 		})
 	}
@@ -157,7 +174,7 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 router.get('/list-time-out', async (req, res) => {
 	const allProduct = await productModel.findAll()
 	const prodImages = await productImageModel.findAll()
-	const listBidder = await auctionModel.findAll()
+	const listBidder = await auctionStatusModel.findAll()
 	const allAccount = await accountModel.findAll()
 
 	const listFilter = allProduct.filter((item) => {
@@ -181,13 +198,30 @@ router.get('/list-time-out', async (req, res) => {
 				}
 			})
 
-			const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
-			const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
+			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
+			if (biggestBidder) {
+				const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
+					return {
+						accId: item.acc_id,
+						accName: item.acc_full_name,
+						accEmail: item.acc_email
+					}
+				})
+	
 				return {
-					accId: item.acc_id,
-					accName: item.acc_name
+					prodId: element.prod_id,
+					prodName: element.prod_name,
+					prodCateId: element.prod_cate_id,
+					prodOfferNumber: element.prod_offer_number,
+					prodBeginPrice: element.prod_begin_price,
+					prodStepPrice: element.prod_step_price,
+					prodBuyPrice: element.prod_buy_price,
+					prodImages: prodImageInfo || [],
+					owner: accountInfo || null,
+					createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+					expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
-			})
+			}
 
 			return {
 				prodId: element.prod_id,
@@ -198,10 +232,11 @@ router.get('/list-time-out', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: accountInfo || null,
+				owner: null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
+			
 		}).slice(0, 5)
 	
 		return res.status(200).json({
@@ -219,13 +254,30 @@ router.get('/list-time-out', async (req, res) => {
 			}
 		})
 
-		const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
-		const accountInfo = allAccount.find((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((item) => {
+		const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
+		if (biggestBidder) {
+			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_full_name,
+					accEmail: item.acc_email
+				}
+			})
+	
 			return {
-				accId: item.acc_id,
-				accName: item.acc_name
+				prodId: element.prod_id,
+				prodName: element.prod_name,
+				prodCateId: element.prod_cate_id,
+				prodOfferNumber: element.prod_offer_number,
+				prodBeginPrice: element.prod_begin_price,
+				prodStepPrice: element.prod_step_price,
+				prodBuyPrice: element.prod_buy_price,
+				prodImages: prodImageInfo || [],
+				owner: accountInfo || null,
+				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
-		})
+		}
 
 		return {
 			prodId: element.prod_id,
@@ -236,10 +288,11 @@ router.get('/list-time-out', async (req, res) => {
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
 			prodImages: prodImageInfo || [],
-			owner: accountInfo || null,
+			owner: null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
+		
 	}).slice(0, 5)
 	
 	return res.status(200).json({
@@ -271,6 +324,7 @@ router.get('/list-biggest-offer', async (req, res) => {
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
+					accName: item.acc_full_name,
 					accEmail: item.acc_email
 				}
 			})
@@ -335,6 +389,7 @@ router.get('/list-biggest-price', async (req, res) => {
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
+					accName: item.acc_full_name,
 					accEmail: item.acc_email
 				}
 			})
@@ -398,6 +453,7 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 				return {
 					accId: item.acc_id,
+					accName: item.acc_full_name,
 					accEmail: item.acc_email
 				}
 			})
@@ -486,11 +542,14 @@ router.post('/detail', productValidation.details, async (req, res) => {
 
 		return {
 			accId: element.acc_id,
-			accName: element.acc_name,
+			accName: element.acc_full_name || '',
+			accEmail: element.acc_email,
 			accGoodVote: bidderGoodVote.length || 0,
 			accBadVote: bidderBadVote.length || 0
 		}
 	})
+
+	console.log(sellerInfo)
 
 	const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
 
@@ -501,7 +560,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 	
 			return {
 				accId: element.acc_id,
-				accName: element.acc_name,
+				accName: element.acc_full_name || '',
+				accEmail: element.acc_email,
 				accGoodVote: bidderGoodVote.length || 0,
 				accBadVote: bidderBadVote.length || 0
 			}
@@ -550,6 +610,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
 	})
+
+	// console.log(result)
 
 	return res.status(200).json({
 		productDetail: result,
@@ -602,6 +664,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 					return {
 						accId: item.acc_id,
+						accName: item.acc_full_name,
 						accEmail: item.acc_email
 					}
 				})
@@ -704,6 +767,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
 						return {
 							accId: item.acc_id,
+							accName: item.acc_full_name,
 							accEmail: item.acc_email
 						}
 					})

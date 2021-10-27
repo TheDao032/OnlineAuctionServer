@@ -95,34 +95,35 @@ const addWatch = (req, res, next) => {
 // 	next()
 // }
 
-// const deleteWatch = (req, res, next) => {
-// 	const shema = {
-//   		type: 'object',
-//   		properties: {
-// 			cartId: { type: 'integer' }
-//   		},
-// 		required: ['cartId'],
-// 		additionalProperties: true
-// 	}
+const deleteWatch = (req, res, next) => {
+	const shema = {
+  		type: 'object',
+  		properties: {
+			cartId: { type: 'integer' }
+  		},
+		required: ['cartId'],
+		additionalProperties: true
+	}
 
-// 	const ajv = new ajvLib({
-// 		allerrors: true
-// 	})
+	const ajv = new ajvLib({
+		allerrors: true
+	})
 
-// 	const validator = ajv.compile(shema)
-// 	const valid = validator(req.body)
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
 
-// 	if (!valid) {
-// 		return res.status(400).json({
-// 			errormessage: validator.errors[0].message,
-// 			statuscode: errorCode
-// 		})
-// 	}
+	if (!valid) {
+		return res.status(400).json({
+			errormessage: validator.errors[0].message,
+			statuscode: errorCode
+		})
+	}
 
-// 	next()
-// }
+	next()
+}
 
 module.exports = {
     addWatch,
-	queryInfo
+	queryInfo,
+	deleteWatch
 }
