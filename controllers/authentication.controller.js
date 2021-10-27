@@ -2,6 +2,7 @@ const express = require('express')
 const jsonWebToken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const randomstring = require('randomstring')
+const moment = require('moment')
 
 const router = express.Router()
 const knex = require('../utils/dbConnection')
@@ -76,7 +77,7 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 		acc_email: accEmail,
 		acc_phone_number: accPhoneNumber || null,
 		acc_full_name: accFullName || null,
-		acc_role: 'BIDDER',
+		acc_role: 'BID',
 		acc_token: hashToken,
 		acc_created_date: presentDate
 	}
