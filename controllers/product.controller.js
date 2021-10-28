@@ -525,16 +525,38 @@ router.post('/detail', productValidation.details, async (req, res) => {
 	const productInfo = await productModel.findById(prodId)
 	const productImageList = await productImageModel.findByProdId(prodId)
 	const productDescriptionList = await productDescriptionModel.findByProdId(prodId)
-	const listBidder = await auctionModel.findAll()
+	const listBidder = await auctionStatusModel.findAll()
 	const listComment = await commentModel.findAll()
 	const allAccount = await accountModel.findAll()
+	const relatedProduct = await productModel.findByCateId(productInfo[0].prod_cate_id)
+	const productImages = await productImageModel.findAll()
 
-	if (productInfo.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Invalid Product Id`,
-			statusCode: 1
-		})
-	}
+	const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === prodId)
+
+	// const allBidderOfProd = listBidder.filter((item) => item.stt_prod_id === prodId && item.stt_bidder_id !== biggestBidder.stt_bidder_id)
+
+	// const allBidderInfo = allBidderOfProd.map((element) => {
+	// 	const bidderInfo = allAccount.find((item) => item.acc_id === element.stt_bidder_id)
+
+	// 	const bidderGoodVote = listComment.filter((item) => item.cmt_to_id === bidderInfo.acc_id && item.cmt_vote === 1)
+	// 	const bidderBadVote = listComment.filter((item) => item.cmt_to_id === bidderInfo.acc_id && item.cmt_vote === -1)
+
+	// 	return {
+	// 		accId: bidderInfo.acc_id,
+	// 		accName: bidderInfo.acc_full_name || '',
+	// 		accEmail: bidderInfo.acc_email,
+	// 		accGoodVote: bidderGoodVote.length || 0,
+	// 		accBadVote: bidderBadVote.length || 0
+	// 	}
+	// })
+
+	const convertProdImage = productImageList.map((info) => {
+		return {
+			prodImgId: info.prod_img_id,
+			prodImgProductId: info.prod_img_product_id,
+			prodImgData: info.prod_img_data
+		}
+	})
 
 	const sellerInfo = allAccount.filter((item) => item.acc_id === productInfo[0].prod_acc_id).map((element) => {
 		const bidderGoodVote = listComment.filter((item) => item.cmt_to_id === element.acc_id && item.cmt_vote === 1)
@@ -549,12 +571,39 @@ router.post('/detail', productValidation.details, async (req, res) => {
 		}
 	})
 
-	console.log(sellerInfo)
+	const convertRelatedProd = relatedProduct.map((element) => {
+		const convertImage = productImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+			return {
+				prodImgId: info.prod_img_id,
+				prodImgProductId: info.prod_img_product_id,
+				prodImgData: info.prod_img_data
+			}
+		})
 
-	const biggestBidder = listBidder.find((item) => item.auc_is_biggest === 0 && item.auc_prod_id === prodId)
+		return {
+			prodId: element.prod_id,
+			prodName: element.prod_name,
+			prodCateId: element.prod_cate_id,
+			prodOfferNumber: element.prod_offer_number,
+			prodBeginPrice: element.prod_begin_price,
+			prodStepPrice: element.prod_step_price,
+			prodBuyPrice: element.prod_buy_price,
+			prodImages: convertImage,
+			seller: sellerInfo || null,
+			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+		}
+	}).slice(0, 5)
+
+	if (productInfo.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Invalid Product Id`,
+			statusCode: 1
+		})
+	}
 
 	if (biggestBidder) {
-		const bidderInfo = allAccount.filter((item) => item.acc_id === biggestBidder[0].auc_bidder_id).map((element) => {
+		const bidderInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((element) => {
 			const bidderGoodVote = listComment.filter((item) => item.cmt_to_id === element.acc_id && item.cmt_vote === 1)
 			const bidderBadVote = listComment.filter((item) => item.cmt_to_id === element.acc_id && item.cmt_vote === -1)
 	
@@ -578,12 +627,14 @@ router.post('/detail', productValidation.details, async (req, res) => {
 				prodBeginPrice: element.prod_begin_price,
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
-				prodImages: productImageList,
+				prodImages: convertProdImage,
 				prodDescription: productDescriptionList,
-				bidder: bidderInfo || null,
+				biggestBidder: bidderInfo || null,
+				// allBidder: allBidderInfo,
 				seller: sellerInfo || null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
-				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss'),
+				relatedProduct: convertRelatedProd
 			}
 		})
 	
@@ -602,16 +653,16 @@ router.post('/detail', productValidation.details, async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
-			prodImages: productImageList,
+			prodImages: convertProdImage,
 			prodDescription: productDescriptionList,
-			bidder: null,
+			biggestBidder: null,
+			// allBidder: allBidderInfo,
 			seller: sellerInfo,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
-			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss'),
+			relatedProduct: convertRelatedProd
 		}
 	})
-
-	// console.log(result)
 
 	return res.status(200).json({
 		productDetail: result,
