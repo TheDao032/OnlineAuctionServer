@@ -11,6 +11,7 @@ const productImagesModel = require('../models/productImage.model')
 const productDescriptionModel = require('../models/productDescription.model')
 const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
+const accountModel = require('../models/account.model')
 
 const productValidation = require('../middlewares/validation/product.validate')
 const auctionValidation = require('../middlewares/validation/auction.validate')
@@ -25,6 +26,7 @@ router.post('/list-auction', auctionValidation.listAuction, async (req, res) => 
 	const ts = req.query.ts || 0
 
 	const listProduct = await productModel.findAll()
+	const allAccount = await accountModel.findAll()
 
 	let loop = 0
 
@@ -33,12 +35,15 @@ router.post('/list-auction', auctionValidation.listAuction, async (req, res) => 
 		
 		if (listBidder.length !== 0) {
 			const convertListBidder = listBidder.map((element) => {
+				const bidderInfo = allAccount.find((item) => item.acc_id === element.stt_bidder_id)
 				const prodInfo = listProduct.find((item) => item.prod_id === element.stt_prod_id)
 				return {
 					sttId: element.stt_id,
 					sttProdName: prodInfo.prod_name,
 					sttProdId: element.stt_prod_id,
 					sttBidderId: element.stt_bidder_id,
+					sttBidderName: bidderInfo.acc_name || null,
+					sttBidderEmail: bidderInfo.acc_email,
 					sttBiggestPrice: element.stt_biggest_price
 				}
 			})
