@@ -2,6 +2,7 @@ const express = require('express')
 const jsonWebToken = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const randomstring = require('randomstring')
+const moment = require('moment')
 
 const router = express.Router()
 const knex = require('../utils/dbConnection')
