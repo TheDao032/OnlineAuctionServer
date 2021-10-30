@@ -7,7 +7,7 @@ const newProduct = (req, res, next) => {
 		type: 'object',
 		properties: {
 			prodName: { type: 'string', maxLength: 100 },
-			prodCateId: { type: 'string', pattern: '^\\d+$' },
+			prodCateId: { type: 'integer' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
