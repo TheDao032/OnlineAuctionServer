@@ -708,6 +708,14 @@ router.post('/list-permission', sellerValidation.listPermission, async (req, res
 	const { accId } = req.account
 	const { page, limit } = req.query
 	
+	const prodInfo = await productModel.findBySellerAndProduct(accId, prodId)
+
+	if (prodInfo.length === 0) {
+		return res.status(200).json({
+			errorMessage: `Product Is Not Belong To Seller`,
+			statusCode: errorCode
+		})
+	}
 	const listPermissionInfo = await auctionPermissionModel.findBySellerAndProduct(accId, prodId)
 	const allAccount = await accountModel.findAll()
 
