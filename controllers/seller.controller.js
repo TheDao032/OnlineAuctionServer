@@ -26,7 +26,7 @@ const errorCode = 1
 
 router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 
-	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription } = req.body
+	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription, prodExpired } = req.body
 	const prodImage = req.files
 
 	let checkProdImage = false
@@ -82,7 +82,7 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-	const expireDate = moment(new Date(moment().year(), moment().month(), moment().date() + 1, moment().hour(), moment().minute(), moment().second())).format('YYYY-MM-DD HH:mm:ss')
+	const expireDate = moment(new Date(moment().year(), moment().month(), moment().date() + prodExpired, moment().hour(), moment().minute(), moment().second())).format('YYYY-MM-DD HH:mm:ss')
 
 	const convertBegin = parseFloat(prodBeginPrice)
 
