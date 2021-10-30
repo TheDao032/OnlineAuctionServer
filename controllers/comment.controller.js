@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const knex = require('../utils/dbConnection')
-const moment = require('moment');
+const moment = require('moment')
 
 const productModel = require('../models/product.model')
 const accountModel = require('../models/account.model')
