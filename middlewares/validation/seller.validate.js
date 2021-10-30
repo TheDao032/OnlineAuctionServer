@@ -286,6 +286,33 @@ const takePermission = (req, res, next) => {
 	next()
 }
 
+const listPermission = (req, res, next) => {
+	const shema = {
+		type: 'object',
+		properties: {
+			prodId: { type: 'integer' }
+		},
+		required: ['prodId'],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
+
+	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
 module.exports = {
 	deleteProduct,
 	myProduct,
@@ -296,5 +323,6 @@ module.exports = {
 	newProduct,
 	banBidder,
 	givePermission,
-	takePermission
+	takePermission,
+	listPermission
 }

@@ -34,9 +34,9 @@ const addWatch = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-    		watchId: { type: 'integer' }
+    		prodId: { type: 'integer' }
   		},
-		required: ['watchId'],
+		required: ['prodId'],
 		additionalProperties: true
 	}
 

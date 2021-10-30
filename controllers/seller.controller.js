@@ -703,4 +703,54 @@ router.post('/take-permission', sellerValidation.givePermission, async (req, res
 	})
 })
 
+router.post('/list-permission', sellerValidation.listPermission, async (req, res) => {
+	const { prodId } = req.body
+	const { accId } = req.account
+	const { page, limit } = req.query
+	
+	const listPermissionInfo = await auctionPermissionModel.findBySellerAndProduct(accId, prodId)
+	const allAccount = await accountModel.findAll()
+
+
+	const convertListPermission = listPermissionInfo.map((element) => {
+		const bidderInfo = allAccount.find((item) => item.acc_id === element.per_bidder_id)
+		return {
+			perBidderId: element.per_bidder_id,
+			perBidderName: bidderInfo.acc_full_name || '',
+			perBidderEmail: bidderInfo.acc_email,
+			perCanAuction: element.per_can_auction,
+		}
+	})
+
+	if (convertListPermission) {
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(convertListPermission.length / parseInt(limit))
+
+			if (convertListPermission.length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = convertListPermission.slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listPermission: paginationResult,
+				statusCode: successCode
+			})
+		}
+		
+		return res.status(200).json({
+			listPermission: convertListPermission,
+			statusCode: successCode
+		})
+	}
+
+	return res.status(200).json({
+		listPermission: [],
+		statusCode: errorCode
+	})
+})
+
 module.exports = router
