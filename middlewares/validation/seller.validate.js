@@ -12,8 +12,9 @@ const newProduct = (req, res, next) => {
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodDescription: { type: 'string' },
+			prodExpired: { type: 'integer' },
 		},
-		required: ['prodName', 'prodCateId', 'prodStepPrice'],
+		required: ['prodName', 'prodCateId', 'prodStepPrice', 'prodExpired'],
 		additionalProperties: true
 	}
 
