@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const moment = require('moment');
+const moment = require('moment')
 
 const knex = require('../utils/dbConnection')
 const productValidation = require('../middlewares/validation/product.validate')
@@ -95,13 +95,22 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
 
 	const allProducts = await productModel.findAll()
-	const listBidder = await auctionStatusModel.findAll()
+	// const listBidder = await auctionStatusModel.findAll()
 	const allAccount = await accountModel.findAll()
+	const prodImages = await productImageModel.findAll()
 	
 	const convertListProduct = allProducts.map((element) => {
-		const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
-		if (biggestBidder) {
-			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
+		const sellerInfo = allAccount.filter((item) => item.acc_id === element.prod_acc_id)
+		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+			return {
+				prodImgId: info.prod_img_id,
+				prodImgProductId: info.prod_img_product_id,
+				prodImgData: info.prod_img_data
+			}
+		})
+
+		if (sellerInfo) {
+			const accountInfo = sellerInfo.map((item) => {
 				return {
 					accId: item.acc_id,
 					accName: item.acc_full_name,
@@ -117,7 +126,8 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 				prodBeginPrice: element.prod_begin_price,
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
-				owner: accountInfo || null,
+				prodImages: prodImageInfo || [],
+				seller: accountInfo[0] || null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -131,7 +141,8 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			prodBeginPrice: element.prod_begin_price,
 			prodStepPrice: element.prod_step_price,
 			prodBuyPrice: element.prod_buy_price,
-			owner: null,
+			prodImages: prodImageInfo || [],
+			seller: null,
 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 		}
