@@ -47,6 +47,13 @@ const del = async (prodId) => {
 			.del()
 }
 
+const findBySellerAndProduct = async (sellerId, prodId) => {
+	const info = await knex('tbl_product')
+			.where({ prod_id: prodId, prod_acc_id: sellerId })
+
+	return info
+}
+
 module.exports = {
 	findById,
 	findByCateId,
@@ -54,5 +61,6 @@ module.exports = {
 	findByAccId,
 	create,
 	update,
-	del
+	del,
+	findBySellerAndProduct
 }
