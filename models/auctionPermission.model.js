@@ -27,6 +27,14 @@ const findByBidderAndProduct = async (bidderId, prodId) => {
     return info
 }
 
+
+const findBySellerAndProduct = async (sellerId, prodId) => {
+    const info = await knex('tbl_permission')
+                    .where({ per_seller_id: sellerId, per_prod_id: prodId })
+
+    return info
+}
+
 const findByProdId = async (prodId) => {
     const info = await knex('tbl_permission')
                     .where({ per_prod_id: prodId })
@@ -74,5 +82,6 @@ module.exports = {
     del,
 	findByBidderAndProduct,
 	updateWithBidderAndProd,
-    updateWithProdId
+    updateWithProdId,
+    findBySellerAndProduct
 }
