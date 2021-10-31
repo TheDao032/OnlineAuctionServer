@@ -34,6 +34,7 @@ router.get('/list', watchValidation.queryInfo, async (req, res) => {
 
 			if (productInfo) {
 				return {
+					watchId: item.watch_id,
 					prodId: productInfo.prod_id,
 					prodName: productInfo.prod_name,
 					prodCateId: productInfo.prod_cate_id,
