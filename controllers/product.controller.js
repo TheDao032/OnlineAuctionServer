@@ -105,7 +105,8 @@ router.get('/list', productValidation.queryInfo, async (req, res) => {
 			return {
 				prodImgId: info.prod_img_id,
 				prodImgProductId: info.prod_img_product_id,
-				prodImgData: info.prod_img_data
+				prodImgSrc: info.prod_img_src,
+				prodImgSrcId: info.prod_img_src_id
 			}
 		})
 
@@ -205,7 +206,8 @@ router.get('/list-time-out', async (req, res) => {
 				return {
 					prodImgId: info.prod_img_id,
 					prodImgProductId: info.prod_img_product_id,
-					prodImgData: info.prod_img_data
+					prodImgSrc: info.prod_img_src,
+					prodImgSrcId: info.prod_img_src_id
 				}
 			})
 
@@ -325,7 +327,8 @@ router.get('/list-biggest-offer', async (req, res) => {
 			return {
 				prodImgId: info.prod_img_id,
 				prodImgProductId: info.prod_img_product_id,
-				prodImgData: info.prod_img_data
+				prodImgSrc: info.prod_img_src,
+				prodImgSrcId: info.prod_img_src_id
 			}
 		})
 
@@ -390,7 +393,8 @@ router.get('/list-biggest-price', async (req, res) => {
 			return {
 				prodImgId: info.prod_img_id,
 				prodImgProductId: info.prod_img_product_id,
-				prodImgData: info.prod_img_data
+				prodImgSrc: info.prod_img_src,
+				prodImgSrcId: info.prod_img_src_id
 			}
 		})
 		
@@ -455,7 +459,8 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 			return {
 				prodImgId: info.prod_img_id,
 				prodImgProductId: info.prod_img_product_id,
-				prodImgData: info.prod_img_data
+				prodImgSrc: info.prod_img_src,
+				prodImgSrcId: info.prod_img_src_id
 			}
 		})
 
@@ -565,7 +570,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 		return {
 			prodImgId: info.prod_img_id,
 			prodImgProductId: info.prod_img_product_id,
-			prodImgData: info.prod_img_data
+			prodImgSrc: info.prod_img_src,
+			prodImgSrcId: info.prod_img_src_id
 		}
 	})
 
@@ -587,7 +593,8 @@ router.post('/detail', productValidation.details, async (req, res) => {
 			return {
 				prodImgId: info.prod_img_id,
 				prodImgProductId: info.prod_img_product_id,
-				prodImgData: info.prod_img_data
+				prodImgSrc: info.prod_img_src,
+				prodImgSrcId: info.prod_img_src_id
 			}
 		})
 
@@ -717,7 +724,8 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				return {
 					prodImgId: info.prod_img_id,
 					prodImgProductId: info.prod_img_product_id,
-					prodImgData: info.prod_img_data
+					prodImgSrc: info.prod_img_src,
+					prodImgSrc: info.prod_img_src_id
 				}
 			})
 
@@ -820,7 +828,8 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					return {
 						prodImgId: info.prod_img_id,
 						prodImgProductId: info.prod_img_product_id,
-						prodImgData: info.prod_img_data
+						prodImgSrc: info.prod_img_src,
+						prodImgSrcId: info.prod_img_src_id
 					}
 				})
 

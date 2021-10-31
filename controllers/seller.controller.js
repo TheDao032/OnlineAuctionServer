@@ -250,24 +250,18 @@ router.post('/update-product', sellerValidation.updateProduct, async (req, res) 
 })
 
 router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
-	const { prodId, prodImageId } = req.body
-	const prodImage = req.files
+	const { prodId, prodImageId, prodImage } = req.body
 
-	let checkProdImage = false
-	if (prodImage) {
-		checkProdImage = prodImage.image ? true : false
-	}
-
-	if (!checkProdImage) {
+	if (!prodImage || prodImage.length === 0) {
 		return res.status(400).json({
 			errorMessage: `Image Is Required`,
 			statusCode: errorCode
 		})
 	}
 
-	if (prodImage.image.length !== undefined) {
+	if (prodImage.length > 1) {
 		return res.status(400).json({
-			errorMessage: `Too Many Images Are Selected. Please Select 1 Image`,
+			errorMessage: `Only One Image Can Be Updated`,
 			statusCode: errorCode
 		})
 	}
@@ -290,17 +284,18 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 		})
 	}
 
-	const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 	
-	if (!checkValidImage) {
-		return res.status(400).json({
-			errorMessage: `Product's Image Isn't Right Type`,
-			statusCode: errorCode
-		})
-	}
+	// if (!checkValidImage) {
+	// 	return res.status(400).json({
+	// 		errorMessage: `Product's Image Isn't Right Type`,
+	// 		statusCode: errorCode
+	// 	})
+	// }
 
 	const prodImageInfo = {
-		prod_img_data: prodImage.image
+		prod_img_src: prodImage[0].src,
+		prod_img_src_id: prodImage[0].id
 	}
 
 	await productImagesModel.update(prodImageId, prodImageInfo)
@@ -311,15 +306,9 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 })
 
 router.post('/add-image', sellerValidation.addImage, async (req, res) => {
-	const { prodId } = req.body
-	const prodImage = req.files
+	const { prodId, prodImage } = req.body
 
-	let checkProdImage = false
-	if (prodImage) {
-		checkProdImage = prodImage.image ? true : false
-	}
-
-	if (!checkProdImage) {
+	if (!prodImage || prodImage.length === 0) {
 		return res.status(400).json({
 			errorMessage: `Image Is Required`,
 			statusCode: errorCode
@@ -337,38 +326,30 @@ router.post('/add-image', sellerValidation.addImage, async (req, res) => {
 
 	const checkExistProdImage = await productImagesModel.findByProdId(prodId)
 
-	if ((checkExistProdImage.length + prodImage.image.length) > 5) {
+	if ((checkExistProdImage.length + prodImage.length) > 5) {
 		return res.status(400).json({
 			errorMessage: `Already Have ${checkExistProdImage.length} Image, Maximum Image Is 5`,
 			statusCode: errorCode
 		})
 	}
 
-	const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 	
-	if (!checkValidImage) {
-		return res.status(400).json({
-			errorMessage: `Product's Image Isn't Right Type`,
-			statusCode: errorCode
-		})
-	}
+	// if (!checkValidImage) {
+	// 	return res.status(400).json({
+	// 		errorMessage: `Product's Image Isn't Right Type`,
+	// 		statusCode: errorCode
+	// 	})
+	// }
 
-	if (prodImage.image.length === undefined) {
+	for (let i = 0; i < prodImage.length; i++) {
 		const newProdImage = {
 			prod_img_product_id: prodId,
-			prod_img_data: prodImage.image
+			prod_img_src: prodImage[i].src,
+			prod_img_src_id: prodImage[i].id
 		}
 
 		await productImagesModel.create(newProdImage)
-	} else {
-		for (let i = 0; i < prodImage.image.length; i++) {
-			const newProdImage = {
-				prod_img_product_id: prodId,
-				prod_img_data: prodImage.image[i]
-			}
-	
-			await productImagesModel.create(newProdImage)
-		}
 	}
 	
 	return res.status(200).json({
@@ -440,7 +421,8 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
             return {
                 prodImgId: info.prod_img_id,
                 prodImgProductId: info.prod_img_product_id,
-                prodImgData: info.prod_img_data
+                prodImgSrc: info.prod_img_src,
+				prodImgSrcId: info.prod_img_src_id
             }
         })
 
@@ -516,7 +498,8 @@ router.get('/list-bought-product', productValidation.queryInfo, async (req, res)
             return {
                 prodImgId: info.prod_img_id,
                 prodImgProductId: info.prod_img_product_id,
-                prodImgData: info.prod_img_data
+                prodImgSrc: info.prod_img_src,
+				prodImgSrcId: info.prod_img_src_id
             }
         })
 
