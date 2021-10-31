@@ -189,16 +189,20 @@ router.get('/list-time-out', async (req, res) => {
 	const listBidder = await auctionStatusModel.findAll()
 	const allAccount = await accountModel.findAll()
 
+	const presentDate = moment(new Date(moment().year(), moment().month(), moment().date() + 1, moment().hour(), moment().minute(), moment().second()))
+	console.log('present', presentDate.format('YYYY-MM-DD HH:mm:ss'))
+
 	const listFilter = allProduct.filter((item) => {
 
 		const productExpire = moment(new Date(item.prod_expired_date))
 
-		if (moment().year() === productExpire.year() && moment().month() === productExpire.month() && (moment().date() + 1) === productExpire.date()) {
+		if (presentDate.year() === productExpire.year() && presentDate.month() === productExpire.month() && presentDate.date() === productExpire.date()) {
 			return true
 		}
 		
 		return false
 	}).sort((a, b) => a.prod_expired_date - b.prod_expired_date)
+
 
 	if (listFilter.length > 0) {
 		const result = listFilter.map((element) => {
@@ -258,58 +262,58 @@ router.get('/list-time-out', async (req, res) => {
 		})
 	}
 
-	const result = allProduct.map((element) => {
-		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
-			return {
-				prodImgId: info.prod_img_id,
-				prodImgProductId: info.prod_img_product_id,
-				prodImgData: info.prod_img_data
-			}
-		})
+	// const result = allProduct.map((element) => {
+	// 	const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
+	// 		return {
+	// 			prodImgId: info.prod_img_id,
+	// 			prodImgProductId: info.prod_img_product_id,
+	// 			prodImgData: info.prod_img_data
+	// 		}
+	// 	})
 
-		const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
-		if (biggestBidder) {
-			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
-				return {
-					accId: item.acc_id,
-					accName: item.acc_full_name,
-					accEmail: item.acc_email
-				}
-			})
+	// 	const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
+	// 	if (biggestBidder) {
+	// 		const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
+	// 			return {
+	// 				accId: item.acc_id,
+	// 				accName: item.acc_full_name,
+	// 				accEmail: item.acc_email
+	// 			}
+	// 		})
 	
-			return {
-				prodId: element.prod_id,
-				prodName: element.prod_name,
-				prodCateId: element.prod_cate_id,
-				prodOfferNumber: element.prod_offer_number,
-				prodBeginPrice: element.prod_begin_price,
-				prodStepPrice: element.prod_step_price,
-				prodBuyPrice: element.prod_buy_price,
-				prodImages: prodImageInfo || [],
-				owner: accountInfo || null,
-				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
-				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
-			}
-		}
+	// 		return {
+	// 			prodId: element.prod_id,
+	// 			prodName: element.prod_name,
+	// 			prodCateId: element.prod_cate_id,
+	// 			prodOfferNumber: element.prod_offer_number,
+	// 			prodBeginPrice: element.prod_begin_price,
+	// 			prodStepPrice: element.prod_step_price,
+	// 			prodBuyPrice: element.prod_buy_price,
+	// 			prodImages: prodImageInfo || [],
+	// 			owner: accountInfo || null,
+	// 			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+	// 			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+	// 		}
+	// 	}
 
-		return {
-			prodId: element.prod_id,
-			prodName: element.prod_name,
-			prodCateId: element.prod_cate_id,
-			prodOfferNumber: element.prod_offer_number,
-			prodBeginPrice: element.prod_begin_price,
-			prodStepPrice: element.prod_step_price,
-			prodBuyPrice: element.prod_buy_price,
-			prodImages: prodImageInfo || [],
-			owner: null,
-			createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
-			expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
-		}
+	// 	return {
+	// 		prodId: element.prod_id,
+	// 		prodName: element.prod_name,
+	// 		prodCateId: element.prod_cate_id,
+	// 		prodOfferNumber: element.prod_offer_number,
+	// 		prodBeginPrice: element.prod_begin_price,
+	// 		prodStepPrice: element.prod_step_price,
+	// 		prodBuyPrice: element.prod_buy_price,
+	// 		prodImages: prodImageInfo || [],
+	// 		owner: null,
+	// 		createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+	// 		expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+	// 	}
 		
-	}).slice(0, 5)
+	// }).slice(0, 5)
 	
 	return res.status(200).json({
-		listTimeOut: result,
+		listTimeOut: [],
 		statusCode: successCode
 	})
 })
