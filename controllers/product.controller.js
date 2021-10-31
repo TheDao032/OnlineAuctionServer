@@ -190,7 +190,6 @@ router.get('/list-time-out', async (req, res) => {
 	const allAccount = await accountModel.findAll()
 
 	const presentDate = moment(new Date(moment().year(), moment().month(), moment().date() + 1, moment().hour(), moment().minute(), moment().second()))
-	console.log('present', presentDate.format('YYYY-MM-DD HH:mm:ss'))
 
 	const listFilter = allProduct.filter((item) => {
 
@@ -234,7 +233,7 @@ router.get('/list-time-out', async (req, res) => {
 					prodStepPrice: element.prod_step_price,
 					prodBuyPrice: element.prod_buy_price,
 					prodImages: prodImageInfo || [],
-					owner: accountInfo || null,
+					biggestBidder: accountInfo || null,
 					createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 					expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
@@ -249,7 +248,7 @@ router.get('/list-time-out', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: null,
+				biggestBidder: null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -356,7 +355,7 @@ router.get('/list-biggest-offer', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: accountInfo || null,
+				biggestBidder: accountInfo || null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -370,7 +369,7 @@ router.get('/list-biggest-offer', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: null,
+				biggestBidder: null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -422,7 +421,7 @@ router.get('/list-biggest-price', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: accountInfo[0] || null,
+				biggestBidder: accountInfo[0] || null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -436,7 +435,7 @@ router.get('/list-biggest-price', async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: null,
+				biggestBidder: null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -487,7 +486,7 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: accountInfo || null,
+				biggestBidder: accountInfo || null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -501,7 +500,7 @@ router.post('/list-with-cate', productValidation.listWithCate, async (req, res) 
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: null,
+				biggestBidder: null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
@@ -752,7 +751,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					prodStepPrice: element.prod_step_price,
 					prodBuyPrice: element.prod_buy_price,
 					prodImages: prodImageInfo || [],
-					owner: accountInfo || null,
+					biggestBidder: accountInfo || null,
 					createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 					expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
@@ -767,7 +766,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 				prodStepPrice: element.prod_step_price,
 				prodBuyPrice: element.prod_buy_price,
 				prodImages: prodImageInfo || [],
-				owner: null,
+				biggestBidder: null,
 				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 			}
