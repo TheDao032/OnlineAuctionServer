@@ -28,6 +28,7 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 
 	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription, prodExpired } = req.body
 	const prodImage = req.files
+	const { accId } = req.account
 
 	let checkProdImage = false
 	if (prodImage) {
@@ -89,6 +90,7 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 	const newProd = {
 		prod_name: prodName,
 		prod_cate_id: prodCateId,
+		prod_acc_id: accId,
 		prod_begin_price: prodBeginPrice && convertBegin > 0 ? convertBegin : 0,
 		prod_step_price: convertStep,
 		prod_buy_price: prodBuyPrice ? parseFloat(prodBuyPrice) : null,

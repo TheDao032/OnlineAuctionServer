@@ -7,12 +7,12 @@ const newProduct = (req, res, next) => {
 		type: 'object',
 		properties: {
 			prodName: { type: 'string', maxLength: 100 },
-			prodCateId: { type: 'integer' },
+			prodCateId: { type: 'string', pattern: '^\\d+$' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodDescription: { type: 'string' },
-			prodExpired: { type: 'integer' },
+			prodExpired: { type: 'string', pattern: '^\\d+$' },
 		},
 		required: ['prodName', 'prodCateId', 'prodStepPrice', 'prodExpired'],
 		additionalProperties: true
@@ -40,8 +40,8 @@ const updateProduct = (req, res, next) => {
 		type: 'object',
 		properties: {
 			prodId: { type: 'integer' },
-			prodName: { type: 'string', maxLength: 60 },
-			prodCateId: { type: 'string', pattern: '^\\d+$' },
+			prodName: { type: 'string', maxLength: 100 },
+			prodCateId: { type: 'integer' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
