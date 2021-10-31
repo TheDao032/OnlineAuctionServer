@@ -12,10 +12,9 @@ const newProduct = (req, res, next) => {
 				items: [{ 
 					type: 'object',
 					properties: {
-						id: { type: 'string' },
 						src: { type: 'string' }
 					},
-					required: ['id', 'src'],
+					required: ['src'],
 					additionalProperties: true
 				}]
 			},
@@ -116,10 +115,9 @@ const addImage = (req, res, next) => {
 				items: [{ 
 					type: 'object',
 					properties: {
-						id: { type: 'string' },
 						src: { type: 'string' }
 					},
-					required: ['id', 'src'],
+					required: ['src'],
 					additionalProperties: true
 				}]
 			},
