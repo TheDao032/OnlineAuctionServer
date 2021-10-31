@@ -83,7 +83,7 @@ const updateImage = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			prodId: { type: 'string', pattern: '^\\d+$' },
+			prodId: { type: 'integer' },
 		},
 		required: ['prodId'],
 		additionalProperties: true
@@ -110,7 +110,19 @@ const addImage = (req, res, next) => {
 	const shemaBody = {
 		type: 'object',
 		properties: {
-			prodId: { type: 'string', pattern: '^\\d+$' },
+			prodId: { type: 'integer' },
+			prodImage: { 
+				type: 'array',
+				items: [{ 
+					type: 'object',
+					properties: {
+						id: { type: 'string' },
+						src: { type: 'string' }
+					},
+					required: ['id', 'src'],
+					additionalProperties: true
+				}]
+			},
 		},
 		required: ['prodId'],
 		additionalProperties: true
