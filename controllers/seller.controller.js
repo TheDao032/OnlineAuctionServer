@@ -26,14 +26,8 @@ const errorCode = 1
 
 router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 
-	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription, prodExpired } = req.body
-	const prodImage = req.files
+	const { prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodDescription, prodExpired, prodImage } = req.body
 	const { accId } = req.account
-
-	let checkProdImage = false
-	if (prodImage) {
-		checkProdImage = prodImage.image ? true : false
-	}
 
 	const convertStep = parseFloat(prodStepPrice)
 
@@ -108,39 +102,31 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 		})
 	}
 
-	if (checkProdImage) {
-		if (prodImage.image.length > 5) {
+	if (prodImage) {
+		if (prodImage.length > 5) {
 			return res.status(400).json({
 				errorMessage: `Image, Maximum Image Is 5`,
 				statusCode: errorCode
 			})
 		}
 
-		let checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+		// let checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 
-		if (!checkValidImage) {
-			return res.status(400).json({
-				errorMessage: `Product's Images Type Is Invalid Or Product's Images Files Is Bigger Than 5`,
-				statusCode: errorCode
-			})
-		}
+		// if (!checkValidImage) {
+		// 	return res.status(400).json({
+		// 		errorMessage: `Product's Images Type Is Invalid Or Product's Images Files Is Bigger Than 5`,
+		// 		statusCode: errorCode
+		// 	})
+		// }
 
-		if (prodImage.image.length === undefined) {
+		for (let i = 0; i < prodImage.length; i++) {
 			const newProdImage = {
 				prod_img_product_id: returnInfo[0],
-				prod_img_data: prodImage.image
+				prod_img_src: prodImage[i].src,
+				prod_img_src_id: prodImage[i].id
 			}
 	
 			await productImagesModel.create(newProdImage)
-		} else {
-			for (let i = 0; i < prodImage.image.length; i++) {
-				const newProdImage = {
-					prod_img_product_id: returnInfo[0],
-					prod_img_data: prodImage.image[i]
-				}
-		
-				await productImagesModel.create(newProdImage)
-			}
 		}
 	}
 
