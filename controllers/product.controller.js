@@ -193,7 +193,7 @@ router.get('/list-time-out', async (req, res) => {
 
 		const productExpire = moment(new Date(item.prod_expired_date))
 
-		if (moment().year() === productExpire.year() && moment().month() === productExpire.month() && moment().date() === productExpire.date() && (moment().hour() + 1) === productExpire.hour()) {
+		if (moment().year() === productExpire.year() && moment().month() === productExpire.month() && (moment().date() + 1) === productExpire.date()) {
 			return true
 		}
 		
