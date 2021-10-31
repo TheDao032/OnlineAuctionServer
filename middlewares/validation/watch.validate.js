@@ -99,9 +99,9 @@ const deleteWatch = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-			cartId: { type: 'integer' }
+			watchId: { type: 'integer' }
   		},
-		required: ['cartId'],
+		required: ['watchId'],
 		additionalProperties: true
 	}
 
