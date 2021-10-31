@@ -7,12 +7,24 @@ const newProduct = (req, res, next) => {
 		type: 'object',
 		properties: {
 			prodName: { type: 'string', maxLength: 100 },
-			prodCateId: { type: 'string', pattern: '^\\d+$' },
+			prodImage: { 
+				type: 'array',
+				items: [{ 
+					type: 'object',
+					properties: {
+						id: { type: 'string' },
+						src: { type: 'string' }
+					},
+					required: ['id', 'src'],
+					additionalProperties: true
+				}]
+			},
+			prodCateId: { type: 'integer' },
 			prodBeginPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodStepPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodBuyPrice: { type: 'string', pattern: '^\\d*[.]?\\d+$', minLength: 1 },
 			prodDescription: { type: 'string' },
-			prodExpired: { type: 'string', pattern: '^\\d+$' },
+			prodExpired: { type: 'integer' },
 		},
 		required: ['prodName', 'prodCateId', 'prodStepPrice', 'prodExpired'],
 		additionalProperties: true
