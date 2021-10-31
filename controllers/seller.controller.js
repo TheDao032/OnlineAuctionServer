@@ -122,8 +122,7 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 		for (let i = 0; i < prodImage.length; i++) {
 			const newProdImage = {
 				prod_img_product_id: returnInfo[0],
-				prod_img_src: prodImage[i].src,
-				prod_img_src_id: prodImage[i].id
+				prod_img_src: prodImage[i].src
 			}
 	
 			await productImagesModel.create(newProdImage)
@@ -294,8 +293,7 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 	// }
 
 	const prodImageInfo = {
-		prod_img_src: prodImage[0].src,
-		prod_img_src_id: prodImage[0].id
+		prod_img_src: prodImage[0].src
 	}
 
 	await productImagesModel.update(prodImageId, prodImageInfo)
@@ -345,8 +343,7 @@ router.post('/add-image', sellerValidation.addImage, async (req, res) => {
 	for (let i = 0; i < prodImage.length; i++) {
 		const newProdImage = {
 			prod_img_product_id: prodId,
-			prod_img_src: prodImage[i].src,
-			prod_img_src_id: prodImage[i].id
+			prod_img_src: prodImage[i].src
 		}
 
 		await productImagesModel.create(newProdImage)
@@ -421,8 +418,7 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
             return {
                 prodImgId: info.prod_img_id,
                 prodImgProductId: info.prod_img_product_id,
-                prodImgSrc: info.prod_img_src,
-				prodImgSrcId: info.prod_img_src_id
+                prodImgSrc: info.prod_img_src
             }
         })
 
@@ -498,8 +494,7 @@ router.get('/list-bought-product', productValidation.queryInfo, async (req, res)
             return {
                 prodImgId: info.prod_img_id,
                 prodImgProductId: info.prod_img_product_id,
-                prodImgSrc: info.prod_img_src,
-				prodImgSrcId: info.prod_img_src_id
+                prodImgSrc: info.prod_img_src
             }
         })
 
