@@ -412,6 +412,7 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
     const prodDescription = await productDescriptionModel.findAll()
     const prodImages = await productImagesModel.findAll()
 	const listProduct = await productModel.findByAccId(accId)
+	const listBidder = await auctionStatusModel.findAll()
 
     const convertListProduct = listProduct.map((element) => {
         const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
@@ -429,6 +430,33 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
             }
         })
 
+		const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === element.prod_id)
+
+		if (biggestBidder) {
+			const accountInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_full_name,
+					accEmail: item.acc_email
+				}
+			})
+
+			return {
+				prodId: element.prod_id,
+				prodName: element.prod_name,
+				prodCateId: element.prod_cate_id,
+				prodOfferNumber: element.prod_offer_number,
+				prodBeginPrice: element.prod_begin_price,
+				prodStepPrice: element.prod_step_price,
+				prodBuyPrice: element.prod_buy_price,
+				prodImages: prodImageInfo || [],
+				biggestBidder: accountInfo[0] || null,
+				prodDescription: prodDescriptionOfItem || [],
+				createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+				expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+			}
+		}
+
         return {
             prodId: element.prod_id,
             prodName: element.prod_name,
@@ -438,6 +466,7 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
             prodStepPrice: element.prod_step_price,
             prodBuyPrice: element.prod_buy_price,
             prodImages: prodImageInfo || [],
+			biggestBidder: null,
             prodDescription: prodDescriptionOfItem || [],
             createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
             expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')

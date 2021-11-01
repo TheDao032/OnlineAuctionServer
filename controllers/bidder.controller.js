@@ -80,6 +80,16 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 	const prodInfo = await productModel.findById(prodId)
 	const sellerInfo = await accountModel.findById(prodInfo[0].prod_acc_id)
 
+	const now = moment()
+	const expiredDate = moment(new Date(prodInfo[0].prod_expired_date))
+
+	if (now >= expiredDate) {
+		return res.status(200).json({
+			errorMessage: `Product Has Already Expired`,
+			statusCode: errorCode
+		})
+	}
+
 	if (listVote.length !== 0) {
 
 		const checkPositive = listVote.filter((item) => item.cmt_vote === 1)
