@@ -298,7 +298,7 @@ ALTER TABLE public.tbl_product_image_id_seq OWNER TO postgres;
 CREATE TABLE public.tbl_product_images (
     prod_img_id integer DEFAULT nextval('public.tbl_product_image_id_seq'::regclass) NOT NULL,
     prod_img_product_id integer NOT NULL,
-    prod_img_src character varying(100)
+    prod_img_src text
 );
 
 
