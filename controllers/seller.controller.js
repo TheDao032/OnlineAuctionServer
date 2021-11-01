@@ -413,6 +413,7 @@ router.get('/my-product', productValidation.queryInfo, async (req, res) => {
     const prodImages = await productImagesModel.findAll()
 	const listProduct = await productModel.findByAccId(accId)
 	const listBidder = await auctionStatusModel.findAll()
+	const allAccount = await accountModel.findAll()
 
     const convertListProduct = listProduct.map((element) => {
         const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
