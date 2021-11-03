@@ -203,8 +203,8 @@ const updateStatusAccount = (req, res, next) => {
 	const shema = {
   		type: 'object',
   		properties: {
-			accId: { type: 'string', pattern: '^\\d+$' },
-			accStatus: { type: 'string', pattern: '^\\d+$' },
+			accId: { type: 'integer' },
+			accStatus: { type: 'integer' },
   		},
 		required: ['accId', 'accStatus'],
 		additionalProperties: true

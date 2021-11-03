@@ -8,7 +8,7 @@ const bcrypt = require('bcrypt')
 
 const accountModel = require('../models/account.model')
 const roleModel = require('../models/role.model')
-const imageService = require('../services/imageService')
+const commentModel = require('../models/comment.model')
 
 const successCode = 0
 const errorCode = 1
@@ -25,7 +25,6 @@ router.get('/list', accountValidation.queryInfo, async (req, res) => {
 				accEmail: element.acc_email,
 				accPhoneNumber: element.acc_phone_number,
 				accFullName: element.acc_full_name,
-				accAvatar: element.acc_avatar,
 				accStatus: element.acc_status
 			}
 		})
@@ -64,7 +63,7 @@ router.get('/list', accountValidation.queryInfo, async (req, res) => {
 	})
 })
 
-router.post('/details', accountValidation.detailInfo, async (req, res) => {
+router.post('/detail', accountValidation.detailInfo, async (req, res) => {
 	const { accId } = req.body
 	const { accRole } = req.account
 
@@ -77,6 +76,15 @@ router.post('/details', accountValidation.detailInfo, async (req, res) => {
 	}
 
 	const accInfo = await accountModel.findById(accIdFlag)
+	const commentList = await commentModel.findByToId(accIdFlag)
+
+	const convertComment = commentList.map((item) => {
+		return {
+			cmtFromId: item.cmt_from_id,
+			cmtContent: item.cmt_content,
+			cmtVote: item.cmt_vote
+		}
+	})
 
 	if (accInfo.length === 0) {
 		return res.status(200).json({
@@ -85,14 +93,11 @@ router.post('/details', accountValidation.detailInfo, async (req, res) => {
 		})
 	}
 
-	const deliveryAddress = await deliveryModel.findDeliveryByAccId(accIdFlag)
-
 	const responseResult = {
 		accEmail: accInfo[0].acc_email,
 		accFullName: accInfo[0].acc_full_name,
 		accPhoneNumber: accInfo[0].acc_phone_number,
-		accAvatar: accInfo[0].acc_avatar,
-		deliveryAddress: deliveryAddress[0]
+		comment: convertComment
 	}
 
 	return res.status(200).json({
@@ -151,16 +156,10 @@ router.post('/update', accountValidation.updateAccount, async (req, res) => {
 })
 
 router.post('/update-password', accountValidation.updateAccountPassword, async (req, res) => {
-	const { accId, accOldPassword, accNewPassword, accConfirmPassword } = req.body
-	const { accRole } = req.account
+	const { accOldPassword, accNewPassword, accConfirmPassword } = req.body
+	// const { accRole } = req.account
 	
 	let accIdFlag = req.account.accId
-	
-	if (accId) {
-		if (roleModel.checkAdminRole(accRole)) {
-			accIdFlag = accId
-		}
-	}
 
 	const accInfo = await accountModel.findById(accIdFlag)
 
@@ -429,7 +428,8 @@ router.post('/accept-upgrade-seller', accountValidation.upgradeRoleAccount, asyn
 	})
 })
 
-router.get('/list-upgrade-seller',  async (req, res) => {
+router.get('/list-upgrade-seller', accountValidation.queryInfo, async (req, res) => {
+	const { page, limit } = req.query
 	const presentRole = req.account.accRole
 
 	if (!roleModel.checkAdminRole(presentRole)) {
@@ -439,17 +439,45 @@ router.get('/list-upgrade-seller',  async (req, res) => {
 		})
 	}
 	
-	const listUpgradeSeller = await accountModel.update(accId, accountInfo)
+	const listUpgradeSeller = await accountModel.findUpgradeSeller()
 
-	if (listUpgradeSeller.length === 0) {
+	const convertListUpgradeSeller = listUpgradeSeller.map((element) => {
+		return {
+			accId: element.acc_id,
+			accEmail: element.acc_email,
+			accPhoneNumber: element.acc_phone_number,
+			accFullName: element.acc_full_name,
+			accUpgradeStatus: element.acc_upgrade_status
+		}
+	})
+
+	if (convertListUpgradeSeller.length !== 0) {
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(convertListUpgradeSeller.length / parseInt(limit))
+
+			if (convertListUpgradeSeller.length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+
+			const paginationResult = convertListUpgradeSeller.slice(startIndex, endIndex)
+
+			return res.status(200).json({
+				totalPage,
+				listUpgradeSeller: paginationResult,
+				statusCode: successCode
+			})
+		}
+
 		return res.status(200).json({
-			listUpgradeSeller: [],
+			listUpgradeSeller: convertListUpgradeSeller,
 			statusCode: successCode
 		})
 	}
 
 	return res.status(200).json({
-		listUpgradeSeller,
+		listUpgradeSeller: [],
 		statusCode: successCode
 	})
 })

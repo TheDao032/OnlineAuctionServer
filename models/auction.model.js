@@ -41,6 +41,13 @@ const findByProdId = async (prodId) => {
     return info
 }
 
+const findAttendAuction = async (bidderId) => {
+   const info = knex('tbl_auction')
+                    .distinct('auc_bidder_id', 'auc_prod_id')
+                    .where({ auc_bidder_id: bidderId })
+    return info
+}
+
 const create = async (aucInfo) => {
     await knex('tbl_auction')
         .insert(aucInfo)
@@ -75,5 +82,6 @@ module.exports = {
     update,
     del,
 	findByBidderAndProduct,
-	updateWithBidderAndProd
+	updateWithBidderAndProd,
+    findAttendAuction
 }

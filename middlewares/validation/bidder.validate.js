@@ -2,13 +2,14 @@ const ajvLib = require('ajv')
 
 const errorCode = 1
 
-const cancel = (req, res, next) => {
+const queryInfo = (req, res, next) => {
 	const shema = {
-		type: 'object',
-		properties: {
-			prodId: { type: 'integer' },
-		},
-		required: ['prodId'],
+  		type: 'object',
+  		properties: {
+    		page: { type: 'string', pattern: '^\\d+$' },
+			limit: { type: 'string', pattern: '^\\d+$' }
+  		},
+		required: [],
 		additionalProperties: true
 	}
 
@@ -17,7 +18,7 @@ const cancel = (req, res, next) => {
 	})
 
 	const validator = ajv.compile(shema)
-	const valid = validator(req.body)
+	const valid = validator(req.query)
 
 	if (!valid) {
 		return res.status(400).json({
@@ -58,6 +59,6 @@ const offer = (req, res, next) => {
 }
 
 module.exports = {
-	cancel,
-	offer
+	offer,
+	queryInfo
 }

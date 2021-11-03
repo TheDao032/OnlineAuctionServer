@@ -35,6 +35,14 @@ const findByProdId = async (prodId) => {
     return info
 }
 
+const findDistinctByProdId = async (bidderId) => {
+    const info = await knex('tbl_auction_status')
+                    .distinct('stt_bidder_id', 'stt_prod_id')
+                    .where({ stt_bidder_id: bidderId })
+
+    return info
+}
+
 const findByProdIdWithTs = async (prodId, ts) => {
     const mt = moment.unix(ts)
 
@@ -87,5 +95,6 @@ module.exports = {
 	findByBidderAndProduct,
 	updateWithBidderAndProd,
     updateWithProdId,
-    findByProdIdWithTs
+    findByProdIdWithTs,
+    findDistinctByProdId
 }
