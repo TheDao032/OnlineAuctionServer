@@ -34,6 +34,14 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 	const accountInfo = await accountModel.findById(accId)
 
 	const prodInfo = await productModel.findById(prodId)
+
+	if (prodInfo.length === 0) {
+		return res.status(400).json({
+			errorMessage: `Invalid Product Id`,
+			statusCode: errorCode
+		})
+	}
+
 	const sellerInfo = await accountModel.findById(prodInfo[0].prod_acc_id)
 
 	const now = moment()
