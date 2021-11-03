@@ -203,7 +203,7 @@ CREATE TABLE public.tbl_permission (
     per_bidder_id integer,
     per_seller_id integer,
     per_prod_id integer,
-    per_is_cancle integer,
+    per_is_cancel integer,
     per_can_auction integer,
     per_created_date timestamp without time zone,
     per_updated_date timestamp without time zone
