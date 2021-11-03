@@ -7,7 +7,7 @@ const imageproductValidation = require('../middlewares/validation/image.validate
 
 const categoriesModel = require('../models/categories.model')
 const productModel = require('../models/product.model')
-const productImagesModel = require('../models/productImage.model')
+const productImageModel = require('../models/productImage.model')
 const productDescriptionModel = require('../models/productDescription.model')
 const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
@@ -26,50 +26,6 @@ const mailOptions = require('../template/mailOptions')
 const successCode = 0
 const errorCode = 1
 
-router.post('/cancel', bidderValidation.cancel, async (req, res) => {
-	const { prodId } = req.body
-	const { accId } = req.account
-
-	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(accId, prodId)
-	const productInfo = await productModel.findById(prodId)
-	const checkBiggest = checkBidderAuctionExist.find((item) => item.stt_is_biggest === 0)
-
-	if (checkBidderAuctionExist.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Invalid Product Id`,
-			statusCode: errorCode
-		})
-	}
-
-	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
-
-	const auctionStatusInfo = {
-		stt_is_cancle: 1,
-		stt_updated_date: presentDate 
-	}
-
-	await auctionStatusModel.update(checkBidderAuctionExist[0].stt_id, auctionStatusInfo)
-	
-	if (moment(productInfo[0].prod_expired_date) <= moment()) {
-		if (checkBiggest) {
-			const commentInfo = {
-				cmt_to_id: accId,
-				cmt_from_id: productInfo[0].prod_acc_id,
-				cmt_vote: -1,
-				cmt_content: 'Khách Hàng Không Thanh Toán',
-				cmt_created_date: presentDate,
-				cmt_updated_date: presentDate
-			}
-		
-			await commentModel.create(commentInfo)
-		}
-	}
-
-	return res.status(200).json({
-		statusCode: successCode
-	})
-})
-
 router.post('/offer', bidderValidation.offer, async (req, res) => {
 	const { prodId, aucPriceOffer } = req.body
 	const { accId } = req.account
@@ -84,7 +40,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 	const expiredDate = moment(new Date(prodInfo[0].prod_expired_date))
 
 	if (now >= expiredDate) {
-		return res.status(200).json({
+		return res.status(400).json({
 			errorMessage: `Product Has Already Expired`,
 			statusCode: errorCode
 		})
@@ -358,7 +314,173 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 			statusCode: errorCode
 		})
 	}
+})
+
+router.get('/attend-auction', bidderValidation.queryInfo, async (req, res) => {
+	const { page, limit } = req.query
+	const { accId } = req.account
+
+	const allProducts = await productModel.findAll()
+	const allAccount = await accountModel.findAll()
+	const prodImages = await productImageModel.findAll()
+	const listAttend = await auctionModel.findAttendAuction(accId)
+
+	const result = await Promise.all([
+		listAttend.map((element) => {
+			const prodInfo = allProducts.find((item) => item.prod_id === element.auc_prod_id)
+
+			const sellerInfo = allAccount.filter((item) => item.acc_id === prodInfo.prod_acc_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_full_name,
+					accEmail: item.acc_email
+				}
+			})
+			const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === prodInfo.prod_id).map((info) => {
+				return {
+					prodImgId: info.prod_img_id,
+					prodImgProductId: info.prod_img_product_id,
+					prodImgSrc: info.prod_img_src
+				}
+			})
 	
+			return {
+				prodId: prodInfo.prod_id,
+				prodName: prodInfo.prod_name,
+				prodCateId: prodInfo.prod_cate_id,
+				prodOfferNumber: prodInfo.prod_offer_number,
+				prodBeginPrice: prodInfo.prod_begin_price,
+				prodStepPrice: prodInfo.prod_step_price,
+				prodBuyPrice: prodInfo.prod_buy_price,
+				prodImages: prodImageInfo || [],
+				seller: sellerInfo[0],
+				createDate: moment(prodInfo.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+				expireDate: moment(prodInfo.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+			}
+		})
+	])
+
+	if (result) {
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(result[0].length / parseInt(limit))
+
+			if (result[0].length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = result[0].slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listProducts: paginationResult,
+				statusCode: successCode
+			})
+		}
+		
+		return res.status(200).json({
+			listProducts: result[0],
+			statusCode: successCode
+		})
+	}
+
+	return res.status(200).json({
+		listProducts: [],
+		statusCode: successCode
+	})
+})
+
+router.get('/win-auction', bidderValidation.queryInfo, async (req, res) => {
+	const { page, limit } = req.query
+	const { accId } = req.account
+
+	const allProducts = await productModel.findAll()
+	const allAccount = await accountModel.findAll()
+	const prodImages = await productImageModel.findAll()
+	const listWinnerAttend = await auctionStatusModel.findDistinctByProdId(accId)
+
+	const result = await Promise.all([
+		listWinnerAttend.map((element) => {
+			const prodInfo = allProducts.find((item) => item.prod_id === element.stt_prod_id)
+
+			const now = moment()
+			const expiredDate = moment(new Date(prodInfo.prod_expired_date))
+
+			if (now < expiredDate) {
+				return
+			}
+
+			if (element.stt_is_biggest === 1) {
+				return
+			}
+
+			const sellerInfo = allAccount.filter((item) => item.acc_id === prodInfo.prod_acc_id).map((item) => {
+				return {
+					accId: item.acc_id,
+					accName: item.acc_full_name,
+					accEmail: item.acc_email
+				}
+			})
+			const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === prodInfo.prod_id).map((info) => {
+				return {
+					prodImgId: info.prod_img_id,
+					prodImgProductId: info.prod_img_product_id,
+					prodImgSrc: info.prod_img_src
+				}
+			})
+	
+			return {
+				prodId: prodInfo.prod_id,
+				prodName: prodInfo.prod_name,
+				prodCateId: prodInfo.prod_cate_id,
+				prodOfferNumber: prodInfo.prod_offer_number,
+				prodBeginPrice: prodInfo.prod_begin_price,
+				prodStepPrice: prodInfo.prod_step_price,
+				prodBuyPrice: prodInfo.prod_buy_price,
+				prodImages: prodImageInfo || [],
+				seller: sellerInfo[0],
+				createDate: moment(prodInfo.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
+				expireDate: moment(prodInfo.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
+			}
+		}).filter((item) => {
+			if (!item) {
+				return false
+			}
+			
+			return true
+		})
+	])
+
+	if (result) {
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(result[0].length / parseInt(limit))
+
+			if (result[0].length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = result[0].slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listProducts: paginationResult,
+				statusCode: successCode
+			})
+		}
+		
+		return res.status(200).json({
+			listProducts: result[0],
+			statusCode: successCode
+		})
+	}
+
+	return res.status(200).json({
+		listProducts: [],
+		statusCode: successCode
+	})
 })
 
 module.exports = router

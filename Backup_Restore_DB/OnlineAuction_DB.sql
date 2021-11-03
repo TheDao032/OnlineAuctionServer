@@ -203,7 +203,7 @@ CREATE TABLE public.tbl_permission (
     per_bidder_id integer,
     per_seller_id integer,
     per_prod_id integer,
-    per_is_cancle integer,
+    per_is_cancel integer,
     per_can_auction integer,
     per_created_date timestamp without time zone,
     per_updated_date timestamp without time zone
@@ -417,7 +417,7 @@ COPY public.tbl_comment (cmt_id, cmt_vote, cmt_content, cmt_from_id, cmt_to_id, 
 -- Data for Name: tbl_permission; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tbl_permission (per_id, per_bidder_id, per_seller_id, per_prod_id, per_is_cancle, per_can_auction, per_created_date, per_updated_date) FROM stdin;
+COPY public.tbl_permission (per_id, per_bidder_id, per_seller_id, per_prod_id, per_is_cancel, per_can_auction, per_created_date, per_updated_date) FROM stdin;
 1	5	3	1	\N	0	\N	\N
 2	6	3	1	\N	1	\N	2021-10-23 22:40:18
 \.

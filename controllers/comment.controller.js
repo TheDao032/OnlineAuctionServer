@@ -101,8 +101,64 @@ router.post('/new-comment', commentValidation.newComment, async (req, res) => {
 //     })
 // })
 
-router.get('/my-comment', async (req, res) => {
+router.get('/my-comment', commentValidation.queryInfo, async (req, res) => {
+    const { page, limit } = req.query
+    const { accId } = req.account
 
+    const commentInfo = await commentModel.findByFromId(accId)
+
+    if (commentInfo.length === 0) {
+        return res.status(200).json({
+            listComments: [],
+            statusCode: successCode
+        })
+    }
+
+    const convertComment = commentInfo.map((element) => {
+        return {
+            cmtId: element.cmt_id,
+            cmtVote: element.cmt_vote,
+            cmtContent: element.cmt_content,
+            cmtFromId: element.cmt_from_id,
+            cmtToId: element.cmt_to_id,
+            createDate: moment(element.cmt_created_date).format('YYYY-MM-DD HH:mm:ss'),
+            updateDate: moment(element.cmt_updated_date).format('YYYY-MM-DD HH:mm:ss')
+        }
+    })
+
+    if (convertComment) {
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(convertComment.length / parseInt(limit))
+
+			if (convertComment.length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = convertComment.slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listComments: paginationResult,
+				statusCode: successCode
+			})
+		}
+		
+		return res.status(200).json({
+			listComments: convertComment,
+			statusCode: successCode
+		})
+	}
+
+    return res.status(200).json({
+        listComments: [],
+        statusCode: successCode
+    })
+})
+
+router.get('/other-comment', async (req, res) => {
+    const { page , limit } = req.query
     const { accId } = req.account
 
     const commentInfo = await commentModel.findByToId(accId)
@@ -120,13 +176,39 @@ router.get('/my-comment', async (req, res) => {
             cmtVote: element.cmt_vote,
             cmtContent: element.cmt_content,
             cmtFromId: element.cmt_from_id,
+            cmtToId: element.cmt_to_id,
             createDate: moment(element.cmt_created_date).format('YYYY-MM-DD HH:mm:ss'),
             updateDate: moment(element.cmt_updated_date).format('YYYY-MM-DD HH:mm:ss')
         }
     })
 
+    if (convertComment) {
+		if (page && limit) {
+			let startIndex = (parseInt(page) - 1) * parseInt(limit)
+			let endIndex = (parseInt(page) * parseInt(limit))
+			let totalPage = Math.floor(convertComment.length / parseInt(limit))
+
+			if (convertComment.length % parseInt(limit) !== 0) {
+				totalPage = totalPage + 1
+			}
+	
+			const paginationResult = convertComment.slice(startIndex, endIndex)
+	
+			return res.status(200).json({
+				totalPage,
+				listComments: paginationResult,
+				statusCode: successCode
+			})
+		}
+		
+		return res.status(200).json({
+			listComments: convertComment,
+			statusCode: successCode
+		})
+	}
+
     return res.status(200).json({
-        listComments: convertComment,
+        listComments: [],
         statusCode: successCode
     })
 })

@@ -13,6 +13,7 @@ const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
 const auctionPermissionModel = require('../models/auctionPermission.model')
 const accountModel = require('../models/account.model')
+const commentModel = require('../models/comment.model')
 
 const sellerValidation = require('../middlewares/validation/seller.validate')
 const productValidation = require('../middlewares/validation/product.validate')
@@ -755,6 +756,69 @@ router.post('/list-permission', sellerValidation.listPermission, async (req, res
 		listPermission: [],
 		statusCode: errorCode
 	})
+})
+
+router.post('/cancel-bidder', sellerValidation.cancel, async (req, res) => {
+	const { prodId, bidderId } = req.body
+	const { accId } = req.account
+
+	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
+
+	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
+
+	const productInfo = await productModel.findById(prodId)
+	const checkBiggest = checkBidderAuctionExist.find((item) => item.stt_is_biggest === 0)
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	if (moment(productInfo[0].prod_expired_date) > moment()) {
+		return res.status(400).json({
+			errorMessage: `This Product Still Not Expired`,
+			statusCode: errorCode
+		})
+	}
+
+	if (!checkBiggest) {
+		return res.status(400).json({
+			errorMessage: `This Bidder Isn't The Winner`,
+			statusCode: errorCode
+		})
+	}
+	
+	if (checkPermission.length !== 0) {
+		const permissionStatusInfo = {
+			per_is_cancel: 0,
+			per_updated_date: presentDate 
+		}
+
+		await auctionPermissionModel.update(checkPermission[0].per_id, permissionStatusInfo)
+	} else {
+		const auctionStatusInfo = {
+			per_seller_id: accId,
+			per_bidder_id: bidderId,
+			per_prod_id: prodId,
+			per_is_cancel: 0,
+			per_created_date: presentDate,
+			per_updated_date: presentDate 
+		}
+	
+		await auctionStatusModel.create(auctionStatusInfo)
+	}
+
+	const commentInfo = {
+		cmt_to_id: accId,
+		cmt_from_id: bidderId,
+		cmt_vote: -1,
+		cmt_content: 'Khách Hàng Không Thanh Toán',
+		cmt_created_date: presentDate,
+		cmt_updated_date: presentDate
+	}
+
+	await commentModel.create(commentInfo)
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+
 })
 
 module.exports = router
