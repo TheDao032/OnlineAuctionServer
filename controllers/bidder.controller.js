@@ -36,10 +36,6 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 	const prodInfo = await productModel.findById(prodId)
 	const sellerInfo = await accountModel.findById(prodInfo[0].prod_acc_id)
 
-	const permissionInfo = await auctionPermissionModel.findByBidderId(accId)
-
-	if (permissionInfo[0].per_is_cancel)
-
 	const now = moment()
 	const expiredDate = moment(new Date(prodInfo[0].prod_expired_date))
 
