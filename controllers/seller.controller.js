@@ -382,27 +382,27 @@ router.post('/update-description', sellerValidation.updateDescription, async (re
     })
 })
 
-router.post('/ban-bidder', sellerValidation.banBidder, async (req, res) => {
-	const { bidderId, prodId } = req.body
+// router.post('/ban-bidder', sellerValidation.banBidder, async (req, res) => {
+// 	const { bidderId, prodId } = req.body
 
-	const checkExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
+// 	const checkExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
 
-	if (checkExist.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Invalid Product Id Or Account Id`,
-			statusCode: errorCode
-		})
-	}
+// 	if (checkExist.length === 0) {
+// 		return res.status(400).json({
+// 			errorMessage: `Invalid Product Id Or Account Id`,
+// 			statusCode: errorCode
+// 		})
+// 	}
 
-	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+// 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-	const updateAuctionStatus = {
-		stt_is_banned: 1,
-		stt_updated_date: presentDate
-	}
+// 	const updateAuctionStatus = {
+// 		stt_is_banned: 1,
+// 		stt_updated_date: presentDate
+// 	}
 
-	await productDescriptionModel.update(checkExist[0].stt_id, updateAuctionStatus)
-})
+// 	await productDescriptionModel.update(checkExist[0].stt_id, updateAuctionStatus)
+// })
 
 router.get('/my-product', productValidation.queryInfo, async (req, res) => {
 	const { page, limit } = req.query
@@ -647,7 +647,7 @@ router.post('/give-permission', sellerValidation.givePermission, async (req, res
 	})
 })
 
-router.post('/take-permission', sellerValidation.givePermission, async (req, res) => {
+router.post('/take-permission', sellerValidation.takePermission, async (req, res) => {
 	const { bidderId, prodId } = req.body
 	
 	const permissionInfo = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
