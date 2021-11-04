@@ -8,7 +8,8 @@ require('express-async-errors')
 const server = express()
 
 server.use(morgan('dev'))
-server.use(bodyParser.json())
+server.use(bodyParser.json({limit: '200mb'}));
+server.use(bodyParser.urlencoded({limit: '200mb', extended: true}));
 server.use(cors())
 server.use(fileUpload())
 
