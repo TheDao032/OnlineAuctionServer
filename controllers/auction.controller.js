@@ -42,6 +42,7 @@ router.post('/list-auction', auctionValidation.listAuction, async (req, res) => 
 					sttProdName: prodInfo.prod_name,
 					sttProdId: element.stt_prod_id,
 					sttBidderId: element.stt_bidder_id,
+					createdDate: moment(element.stt_created_date).format('YYYY-MM-DD HH:mm:ss'),
 					sttBidderName: bidderInfo.acc_name || null,
 					sttBidderEmail: bidderInfo.acc_email,
 					sttBiggestPrice: element.stt_biggest_price
