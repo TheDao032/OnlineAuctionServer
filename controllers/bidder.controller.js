@@ -42,6 +42,17 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 		})
 	}
 
+	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(accId, prodId)
+
+	if (checkPermission.length !== 0) {
+		if (checkPermission[0].per_can_auction === 0) {
+			return res.status(400).json({
+				errorMessage: `Don't Have Permission From Seller`,
+				statusCode: errorCode
+			})
+		}
+	}
+
 	const sellerInfo = await accountModel.findById(prodInfo[0].prod_acc_id)
 
 	const now = moment()
@@ -182,7 +193,6 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 		})
 	}
 
-	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(accId, prodId)
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
 	if (checkPermission.length === 0) {
