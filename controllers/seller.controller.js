@@ -13,6 +13,7 @@ const auctionModel = require('../models/auction.model')
 const auctionStatusModel = require('../models/auctionStatus.model')
 const auctionPermissionModel = require('../models/auctionPermission.model')
 const accountModel = require('../models/account.model')
+const commentModel = require('../models/comment.model')
 
 const sellerValidation = require('../middlewares/validation/seller.validate')
 const productValidation = require('../middlewares/validation/product.validate')
@@ -761,9 +762,9 @@ router.post('/cancel-bidder', sellerValidation.cancel, async (req, res) => {
 	const { prodId, bidderId } = req.body
 	const { accId } = req.account
 
-	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(accId, prodId)
+	const checkBidderAuctionExist = await auctionStatusModel.findByBidderAndProduct(bidderId, prodId)
 
-	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(accId, prodId)
+	const checkPermission = await auctionPermissionModel.findByBidderAndProduct(bidderId, prodId)
 
 	const productInfo = await productModel.findById(prodId)
 	const checkBiggest = checkBidderAuctionExist.find((item) => item.stt_is_biggest === 0)
@@ -805,7 +806,7 @@ router.post('/cancel-bidder', sellerValidation.cancel, async (req, res) => {
 
 	const commentInfo = {
 		cmt_to_id: accId,
-		cmt_from_id: productInfo[0].prod_acc_id,
+		cmt_from_id: bidderId,
 		cmt_vote: -1,
 		cmt_content: 'Khách Hàng Không Thanh Toán',
 		cmt_created_date: presentDate,
@@ -820,4 +821,4 @@ router.post('/cancel-bidder', sellerValidation.cancel, async (req, res) => {
 
 })
 
-
+module.exports = router
