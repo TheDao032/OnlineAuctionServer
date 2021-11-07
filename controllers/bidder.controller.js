@@ -163,6 +163,13 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 					}
 					await auctionModel.create(auctionInfo)
 
+					const productInfo = {
+						prod_offer_number: prodInfo[0].prod_offer_number + 1,
+						prod_updated_date: presentDate
+					}
+
+					await productModel.update(productInfo, prodInfo[0].prod_id)
+
 					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
 					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
