@@ -47,7 +47,7 @@ const authenticate = async (email, password, callback, req, res) => {
 				role,
 				accStatus: acc_status,
 				accId: acc_id,
-				accFullName: acc_full_name || null,
+				accName: acc_full_name || null,
 				accEmail: acc_email
 			}
 		})
