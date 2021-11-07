@@ -6,10 +6,9 @@ const updateAccountPassword = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-		  accId: { type: 'integer' },
 		  accOldPassword: { type: 'string', pattern: '' },
 		  accNewPassword: { type: 'string', pattern: '', minLength: 1 },
-		  accConfirmPassword: { type: 'string', pattern: '', minLength: 1 },
+		  accConfirmPassword: { type: 'string', pattern: '', minLength: 1 }
 		},
 	  	required: ['accOldPassword', 'accNewPassword', 'accConfirmPassword'],
 	  	additionalProperties: true
