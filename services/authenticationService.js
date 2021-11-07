@@ -35,7 +35,7 @@ const authenticate = async (email, password, callback, req, res) => {
 		})
 	}
 
-	const { acc_id, acc_status, acc_name, acc_email } = result[0]
+	const { acc_id, acc_status, acc_full_name, acc_email } = result[0]
 	const auth = {
 		accStaus: acc_status,
 		accId: acc_id,
@@ -47,7 +47,7 @@ const authenticate = async (email, password, callback, req, res) => {
 				role,
 				accStatus: acc_status,
 				accId: acc_id,
-				accName: acc_name || null,
+				accFullName: acc_full_name || null,
 				accEmail: acc_email
 			}
 		})
