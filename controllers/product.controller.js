@@ -846,7 +846,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 						prodStepPrice: element.prod_step_price,
 						prodBuyPrice: element.prod_buy_price,
 						prodImages: prodImageInfo || [],
-						owner: accountInfo || null,
+						biggestBidder: accountInfo || null,
 						createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 						expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 					}
@@ -861,7 +861,7 @@ router.post('/search', productValidation.productSearching, async (req, res) => {
 					prodStepPrice: element.prod_step_price,
 					prodBuyPrice: element.prod_buy_price,
 					prodImages: prodImageInfo || [],
-					owner: null,
+					biggestBidder: null,
 					createDate: moment(element.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 					expireDate: moment(element.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
 				}
