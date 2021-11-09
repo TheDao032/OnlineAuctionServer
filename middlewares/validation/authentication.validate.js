@@ -35,7 +35,7 @@ const register = (req, res, next) => {
   		type: 'object',
   		properties: {
     		accPassword: { type: 'string', pattern: '', minLength: 1, maxLength: 36 },
-    		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
+    		accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{5,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 },
     		accPhoneNumber: { type: 'string', pattern: '', maxLength: 15 },
 			accFullName: { type: 'string', pattern: '', maxLength: 100 },
     		accRole: { type: 'string', pattern: '', maxLength: 5}
@@ -65,9 +65,10 @@ const confirmToken = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			accToken: { type: 'string', pattern: '', }
+			accToken: { type: 'string', pattern: '' },
+			accId: { type: 'integer' }
 		},
-		required: ['accToken'],
+		required: ['accToken', 'accId'],
 		additionalProperties: false
 	}
 
@@ -94,7 +95,7 @@ const forgotPassword = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-			accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{6,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 }
+			accEmail: { type: 'string', pattern: '^[a-z][a-z0-9_\.]{5,30}@[a-z0-9]{2,}(\.[a-z0-9]{2,4}){1,2}$', maxLength: 100 }
 		},
 		required: ['accEmail'],
 		additionalProperties: false
@@ -122,9 +123,10 @@ const newPassword = (req, res, next) => {
 		type: 'object',
 		properties: {
 			accPassword: { type: 'string', pattern: '' , minLength: 1 },
-			tokenChangePass: { type: 'string', pattern: '' }
+			tokenChangePass: { type: 'string', pattern: '' },
+			accId: { type: 'integer' }
 		},
-		required: ['accPassword', 'tokenChangePass'],
+		required: ['accPassword', 'tokenChangePass', 'accId'],
 		additionalProperties: false
 	}
 
