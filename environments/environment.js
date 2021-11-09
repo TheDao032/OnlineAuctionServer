@@ -12,12 +12,12 @@ const env = {
 	APP_SCOPE: process.env.APP_SCOPE || '',
 	APP_REDIRECT_URI: process.env.APP_REDIRECT_URI || 'localhost:3000',
 	mailConfig: {
-		user: process.env.MAIL_USER || 'nguyenthedao69@gmail.com',
+		user: process.env.MAIL_USER || 'nthedao2705@gmail.com',
 	},
 	// CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || 'gvlt-qlqtpm',
 	// CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '999328783638897',
 	// CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || 'RnKQnvJ3ebzYvG_UvIZxjFD1Xcs',
-	SENDGRID_API_KEY: process.env.SENDGRID_API_KEY || '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'
+	SENDGRID_API_KEY: process.env.SENDGRID_API_KEY || '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'
 }
 
 module.exports = env

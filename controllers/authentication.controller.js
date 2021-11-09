@@ -93,8 +93,7 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 })
 
 router.post('/verification-email', authenticationValidate.confirmToken, async (req, res) => {
-	const { accToken }  = req.body
-	const { accId } = req.account
+	const { accToken, accId }  = req.body
 	
 	const result = await accountModel.findById(accId)
 
@@ -131,8 +130,7 @@ router.post('/verification-email', authenticationValidate.confirmToken, async (r
 
 	return res.status(200).json({
 		statusCode: successCode
-	})
-	
+	})	
 })
 
 router.post('/forgot-password', authenticationValidate.forgotPassword, async (req, res) => {
@@ -168,9 +166,7 @@ router.post('/forgot-password', authenticationValidate.forgotPassword, async (re
 })
 
 router.post('/new-password', authenticationValidate.newPassword, async (req, res) => {
-	const { accPassword, tokenChangePass }  = req.body
-
-	const { accId } = req.account
+	const { accPassword, tokenChangePass, accId }  = req.body
 
 	const accountInfo = await accountModel.findById(accId)
 
