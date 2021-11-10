@@ -65,8 +65,6 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 
 	var token = (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString()
 
-	await mailService.sendMail(mailOptions.registerOptions(accEmail, accEmail, token), req, res)
-
 	const hashPassword = bcrypt.hashSync(accPassword, 3)
 	const hashToken = bcrypt.hashSync(token, 3)
 
@@ -85,6 +83,8 @@ router.post('/register', authenticationValidate.register, async (req, res) => {
 	const newAccId = await knex('tbl_account')
 	.returning('acc_id')
 	.insert(accountInfo)
+
+	await mailService.sendMail(mailOptions.registerOptions(accEmail, accEmail, token), req, res)
 
 	return res.status(200).json({
 		statusCode: successCode,
