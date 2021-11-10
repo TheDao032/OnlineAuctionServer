@@ -126,7 +126,7 @@ router.post('/verification-email', authenticationValidate.confirmToken, async (r
 	}
 	
 
-	await accountModel.update(accid, accountInfo)
+	await accountModel.update(accId, accountInfo)
 
 	return res.status(200).json({
 		statusCode: successCode
