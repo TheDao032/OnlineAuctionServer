@@ -148,7 +148,7 @@ router.post('/forgot-password', authenticationValidate.forgotPassword, async (re
 	let token = 'f' + (Math.floor(Math.random() * (99999 - 10000)) + 10000).toString()
 
 	const cusName = result[0].acc_email
-	await mailService.sendMail(mailOptions.forgotPasswordOptions(accEmail, cusName, token), req, res)
+	
 	const hashToken = bcrypt.hashSync(token, 3)
 	
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
@@ -158,6 +158,8 @@ router.post('/forgot-password', authenticationValidate.forgotPassword, async (re
 	}
 
 	await accountModel.update(result[0].acc_id, accountInfo)
+
+	await mailService.sendMail(mailOptions.forgotPasswordOptions(accEmail, cusName, token), req, res)
 
 	return res.status(200).json({
 		statusCode: successCode,
