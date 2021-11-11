@@ -111,6 +111,7 @@ CREATE TABLE public.tbl_auction_status (
     stt_bidder_id integer,
     stt_prod_id integer,
     stt_is_biggest integer,
+    stt_is_buy_price integer,
     stt_biggest_price double precision,
     stt_created_date timestamp without time zone,
     stt_updated_date timestamp without time zone

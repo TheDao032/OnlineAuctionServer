@@ -32,6 +32,16 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 	const listVote = await commentModel.findByToId(accId)
 	const accountInfo = await accountModel.findById(accId)
+	const auctionStatusInfo = await auctionStatusModel.findByProdId(prodId)
+
+	const isBuyPriceExisted = auctionStatusInfo.filter((item) => item.stt_is_buy_price === 0)
+	
+	if (isBuyPriceExisted) {
+		return res.status(400).json({
+			errorMessage: `This Product Has Already Been Bought With Buy Immediatedly Price`,
+			statusCode: errorCode
+		})
+	}
 
 	const prodInfo = await productModel.findById(prodId)
 
@@ -69,7 +79,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 		const checkPositive = listVote.filter((item) => item.cmt_vote === 1)
 
-		if (checkPositive.length * 100 / parseFloat(listVote.length) > 80) {
+		if (checkPositive.length * 100 / parseFloat(listVote.length) >= 80) {
 
 			const listBidder = await auctionStatusModel.findByProdId(prodId)
 
@@ -80,9 +90,85 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 				})
 			}
 
+			if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
+				const auctionInfo = {
+					auc_prod_id: prodId,
+					auc_bidder_id: accId,
+					auc_price_offer: aucPriceOffer,
+					auc_created_date: presentDate,
+					auc_updated_date: presentDate
+				}
+				await auctionModel.create(auctionInfo)
+
+				const auctionStatusInfo = {
+					stt_bidder_id: accId,
+					stt_prod_id: prodId,
+					stt_is_biggest: 0,
+					stt_is_buy_price: 0,
+					stt_biggest_price: aucPriceOffer,
+					stt_created_date: presentDate,
+					stt_updated_date: presentDate
+				}
+
+				await auctionStatusModel.create(auctionStatusInfo)
+
+				const productInfo = {
+					prod_offer_number: prodInfo[0].prod_offer_number + 1,
+					prod_updated_date: presentDate
+				}
+
+				await productModel.update(productInfo, prodInfo[0].prod_id)
+
+				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+				return res.status(200).json({
+					statusCode: successCode
+				})
+			}
+
 			const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
 			if (listBidder.length === 0) {
+				if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
+					const auctionInfo = {
+						auc_prod_id: prodId,
+						auc_bidder_id: accId,
+						auc_price_offer: aucPriceOffer,
+						auc_created_date: presentDate,
+						auc_updated_date: presentDate
+					}
+					await auctionModel.create(auctionInfo)
+
+					const auctionStatusInfo = {
+						stt_bidder_id: accId,
+						stt_prod_id: prodId,
+						stt_is_biggest: 0,
+						stt_is_buy_price: 0,
+						stt_biggest_price: aucPriceOffer,
+						stt_created_date: presentDate,
+						stt_updated_date: presentDate
+					}
+
+					await auctionStatusModel.create(auctionStatusInfo)
+
+					const productInfo = {
+						prod_offer_number: prodInfo[0].prod_offer_number + 1,
+						prod_updated_date: presentDate
+					}
+
+					await productModel.update(productInfo, prodInfo[0].prod_id)
+
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+					return res.status(200).json({
+						statusCode: successCode
+					})
+				}
+
 				if (prodInfo[0].prod_begin_price <= aucPriceOffer) {
 
 					const auctionInfo = {
@@ -226,6 +312,44 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 				return res.status(200).json({
 					errorMessage: `Invalid Product Id`,
 					statusCode: errorCode
+				})
+			}
+
+			if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
+				const auctionInfo = {
+					auc_prod_id: prodId,
+					auc_bidder_id: accId,
+					auc_price_offer: aucPriceOffer,
+					auc_created_date: presentDate,
+					auc_updated_date: presentDate
+				}
+				await auctionModel.create(auctionInfo)
+
+				const auctionStatusInfo = {
+					stt_bidder_id: accId,
+					stt_prod_id: prodId,
+					stt_is_biggest: 0,
+					stt_is_buy_price: 0,
+					stt_biggest_price: aucPriceOffer,
+					stt_created_date: presentDate,
+					stt_updated_date: presentDate
+				}
+
+				await auctionStatusModel.create(auctionStatusInfo)
+
+				const productInfo = {
+					prod_offer_number: prodInfo[0].prod_offer_number + 1,
+					prod_updated_date: presentDate
+				}
+
+				await productModel.update(productInfo, prodInfo[0].prod_id)
+
+				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+				return res.status(200).json({
+					statusCode: successCode
 				})
 			}
 
