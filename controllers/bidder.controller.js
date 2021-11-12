@@ -36,7 +36,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 	const isBuyPriceExisted = auctionStatusInfo.filter((item) => item.stt_is_buy_price === 0)
 	
-	if (isBuyPriceExisted) {
+	if (isBuyPriceExisted.length !== 0) {
 		return res.status(400).json({
 			errorMessage: `This Product Has Already Been Bought With Buy Immediatedly Price`,
 			statusCode: errorCode
