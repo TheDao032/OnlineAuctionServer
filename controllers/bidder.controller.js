@@ -90,6 +90,8 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 				})
 			}
 
+			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0)
+
 			if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
 				const auctionInfo = {
 					auc_prod_id: prodId,
@@ -123,6 +125,15 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
+				if (biggestBidder) {
+					const updateBiggest = {
+						stt_is_biggest: 1,
+						stt_updated_date: presentDate
+					}
+
+					await auctionStatusModel.updateWithProdId(biggestBidder.stt_prod_id, updateBiggest)
+				}
+
 				return res.status(200).json({
 					statusCode: successCode
 				})
@@ -131,44 +142,6 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 			const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
 			if (listBidder.length === 0) {
-				if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
-					const auctionInfo = {
-						auc_prod_id: prodId,
-						auc_bidder_id: accId,
-						auc_price_offer: aucPriceOffer,
-						auc_created_date: presentDate,
-						auc_updated_date: presentDate
-					}
-					await auctionModel.create(auctionInfo)
-
-					const auctionStatusInfo = {
-						stt_bidder_id: accId,
-						stt_prod_id: prodId,
-						stt_is_biggest: 0,
-						stt_is_buy_price: 0,
-						stt_biggest_price: aucPriceOffer,
-						stt_created_date: presentDate,
-						stt_updated_date: presentDate
-					}
-
-					await auctionStatusModel.create(auctionStatusInfo)
-
-					const productInfo = {
-						prod_offer_number: prodInfo[0].prod_offer_number + 1,
-						prod_updated_date: presentDate
-					}
-
-					await productModel.update(productInfo, prodInfo[0].prod_id)
-
-					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
-
-					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
-
-					return res.status(200).json({
-						statusCode: successCode
-					})
-				}
-
 				if (prodInfo[0].prod_begin_price <= aucPriceOffer) {
 
 					const auctionInfo = {
@@ -212,8 +185,6 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 					statusCode: errorCode
 				})
 			}
-
-			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0)
 
 			const biggestPrice = await auctionModel.findByBidderAndProduct(biggestBidder.stt_bidder_id, biggestBidder.stt_prod_id)
 			const sortByOfferPrice = biggestPrice.sort((a, b) => b.auc_price_offer - a.auc_price_offer)
@@ -315,6 +286,8 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 				})
 			}
 
+			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0)
+
 			if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
 				const auctionInfo = {
 					auc_prod_id: prodId,
@@ -347,6 +320,15 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
 				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+
+				if (biggestBidder) {
+					const updateBiggest = {
+						stt_is_biggest: 1,
+						stt_updated_date: presentDate
+					}
+
+					await auctionStatusModel.updateWithProdId(biggestBidder.stt_prod_id, updateBiggest)
+				}
 
 				return res.status(200).json({
 					statusCode: successCode
@@ -397,8 +379,6 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 					statusCode: errorCode
 				})
 			}
-
-			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0)
 
 			const biggestPrice = await auctionModel.findByBidderAndProduct(biggestBidder.stt_bidder_id, biggestBidder.stt_prod_id)
 			const sortByOfferPrice = biggestPrice.sort((a, b) => b.auc_price_offer - a.auc_price_offer)
