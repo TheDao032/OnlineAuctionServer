@@ -90,15 +90,18 @@ router.post('/update', categoriesValidation.updateCategory, async (req, res) => 
 
 	const allCategories = await categoriesModel.findAll()
 
-	const checkExist = allCategories.find((info) => (info.cate_name.toLowerCase() === cateName.toLowerCase()) && (info.cate_id !== cateId))
+	if (cateName && cateName !== '') {
+		const checkExist = allCategories.find((info) => (info.cate_name.toLowerCase() === cateName.toLowerCase()) && (info.cate_id !== cateId))
 
-	if (checkExist) {
-		return res.status(400).json({
-			errorMessage: 'Category Name Has Already Existed',
-			statusCode: errorCode
-		})
+		if (checkExist) {
+			return res.status(400).json({
+				errorMessage: 'Category Name Has Already Existed',
+				statusCode: errorCode
+			})
+		}
 	}
 
+	
 	if (result.length === 0) {
 		return res.status(400).json({
 			errorMessage: 'Invalid Category Id',
@@ -118,7 +121,7 @@ router.post('/update', categoriesValidation.updateCategory, async (req, res) => 
 			})
 		}
 
-		if (fatherInfo[0].cateFather !== null) {
+		if (fatherInfo[0].cate_father !== null) {
 			return res.status(400).json({
 				errorMessage: `Can't Set Sub-Category To Be Category Father`,
 				statusCode: errorCode
