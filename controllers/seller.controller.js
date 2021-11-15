@@ -600,7 +600,7 @@ router.get('/list-bought-product', productValidation.queryInfo, async (req, res)
 	
 })
 
-router.post('/delete', sellerValidation.deleteProduct, async (req, res) => {
+router.post('/delete-product', sellerValidation.deleteProduct, async (req, res) => {
 	const { prodId } = req.body
 	const checkExist = await productModel.findById(prodId)
 
