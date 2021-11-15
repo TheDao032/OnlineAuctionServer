@@ -25,6 +25,7 @@ router.get('/list', accountValidation.queryInfo, async (req, res) => {
 				accEmail: element.acc_email,
 				accPhoneNumber: element.acc_phone_number,
 				accFullName: element.acc_full_name,
+				accRole: element.acc_role,
 				accStatus: element.acc_status
 			}
 		})
