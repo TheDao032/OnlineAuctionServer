@@ -104,9 +104,9 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 	}
 
 	if (prodImage) {
-		if (prodImage.length > 5) {
+		if (prodImage.length > 4) {
 			return res.status(400).json({
-				errorMessage: `Image, Maximum Image Is 5`,
+				errorMessage: `Maximum Image Is 4`,
 				statusCode: errorCode
 			})
 		}
@@ -146,12 +146,15 @@ router.post('/add-product', sellerValidation.newProduct, async (req, res) => {
 })
 
 router.post('/update-product', sellerValidation.updateProduct, async (req, res) => {
-	const { prodId, prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice } = req.body
+	const { prodId, prodName, prodCateId, prodBeginPrice, prodStepPrice, prodBuyPrice, prodExpired } = req.body
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	const expireDate = moment(new Date(moment().year(), moment().month(), moment().date() + prodExpired, moment().hour(), moment().minute(), moment().second())).format('YYYY-MM-DD HH:mm:ss')
 	let updateProd = {}
 
 	updateProd.prod_updated_date = presentDate
+	updateProd.prod_expired_date = expireDate
 
 	const listProducts = await productModel.findAll()
 
@@ -230,16 +233,16 @@ router.post('/update-product', sellerValidation.updateProduct, async (req, res) 
 		updateProd.prod_cate_id = checkExistProd[0].prod_cate_id
 	}
 
-	if (prodDescription && prodDescription !== '') {
-		const updateProdDescription = {
-			prod_desc_prod_id: prodId,
-			prod_desc_content: prodDescription,
-			prod_desc_created_date: presentDate,
-			prod_desc_updated_date: presentDate
-		}
+	// if (prodDescription && prodDescription !== '') {
+	// 	const updateProdDescription = {
+	// 		prod_desc_prod_id: prodId,
+	// 		prod_desc_content: prodDescription,
+	// 		prod_desc_created_date: presentDate,
+	// 		prod_desc_updated_date: presentDate
+	// 	}
 
-		await productDescriptionModel.create(updateProdDescription)
-	}
+	// 	await productDescriptionModel.create(updateProdDescription)
+	// }
 
 	
 	await productModel.update(updateProd, prodId)
@@ -250,62 +253,17 @@ router.post('/update-product', sellerValidation.updateProduct, async (req, res) 
 })
 
 router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
-	const { prodId, prodImageId, prodImage } = req.body
+	const { prodId, prodImage, prodImageDel } = req.body
 
-	if (!prodImage || prodImage.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Image Is Required`,
-			statusCode: errorCode
-		})
+	allProdImages = await productImagesModel.findAll()
+
+	for (let i = 0; i < prodImageDel.length; i++) {
+		checkExistProdImage = allProdImages.find((item) => item.prod_img_id === prodImageDel[0].prodImgId)
+
+		if (checkExistProdImage) {
+			await productImagesModel.del(item.prod_img_id)
+		}
 	}
-
-	if (prodImage.length > 1) {
-		return res.status(400).json({
-			errorMessage: `Only One Image Can Be Updated`,
-			statusCode: errorCode
-		})
-	}
-
-	const checkExistProd = await productModel.findById(prodId)
-
-	if (checkExistProd.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Product Doesn't Exist`,
-			statusCode: errorCode
-		})
-	}
-
-	const checkExistProdImage = await productImagesModel.findByIdAndProd(prodId, prodImageId)
-
-	if (checkExistProdImage.length === 0) {
-		return res.status(400).json({
-			errorMessage: `Product Image Doesn't Exist`,
-			statusCode: errorCode
-		})
-	}
-
-	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
-	
-	// if (!checkValidImage) {
-	// 	return res.status(400).json({
-	// 		errorMessage: `Product's Image Isn't Right Type`,
-	// 		statusCode: errorCode
-	// 	})
-	// }
-
-	const prodImageInfo = {
-		prod_img_src: prodImage[0].src
-	}
-
-	await productImagesModel.update(prodImageId, prodImageInfo)
-
-	return res.status(200).json({
-		statusCode: successCode
-	})
-})
-
-router.post('/add-image', sellerValidation.addImage, async (req, res) => {
-	const { prodId, prodImage } = req.body
 
 	if (!prodImage || prodImage.length === 0) {
 		return res.status(400).json({
@@ -325,12 +283,14 @@ router.post('/add-image', sellerValidation.addImage, async (req, res) => {
 
 	const checkExistProdImage = await productImagesModel.findByProdId(prodId)
 
-	if ((checkExistProdImage.length + prodImage.length) > 5) {
+	if (checkExistProdImage.length + prodImage.length > 4) {
 		return res.status(400).json({
-			errorMessage: `Already Have ${checkExistProdImage.length} Image, Maximum Image Is 5`,
+			errorMessage: `Already Have ${checkExistProdImage.length} Image, Maximum Image Is 4`,
 			statusCode: errorCode
 		})
 	}
+
+
 
 	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 	
@@ -342,18 +302,68 @@ router.post('/add-image', sellerValidation.addImage, async (req, res) => {
 	// }
 
 	for (let i = 0; i < prodImage.length; i++) {
-		const newProdImage = {
-			prod_img_product_id: prodId,
+		const prodImageInfo = {
 			prod_img_src: prodImage[i].src
 		}
-
-		await productImagesModel.create(newProdImage)
-	}
 	
+		await productImagesModel.create(prodImageInfo)
+	}
+
 	return res.status(200).json({
 		statusCode: successCode
 	})
 })
+
+// router.post('/add-image', sellerValidation.addImage, async (req, res) => {
+// 	const { prodId, prodImage } = req.body
+
+// 	if (!prodImage || prodImage.length === 0) {
+// 		return res.status(400).json({
+// 			errorMessage: `Image Is Required`,
+// 			statusCode: errorCode
+// 		})
+// 	}
+
+// 	const checkExistProd = await productModel.findById(prodId)
+
+// 	if (checkExistProd.length === 0) {
+// 		return res.status(400).json({
+// 			errorMessage: `Product Doesn't Exist`,
+// 			statusCode: errorCode
+// 		})
+// 	}
+
+// 	const checkExistProdImage = await productImagesModel.findByProdId(prodId)
+
+// 	if ((checkExistProdImage.length + prodImage.length) > 4) {
+// 		return res.status(400).json({
+// 			errorMessage: `Already Have ${checkExistProdImage.length} Image, Maximum Image Is 4`,
+// 			statusCode: errorCode
+// 		})
+// 	}
+
+// 	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
+	
+// 	// if (!checkValidImage) {
+// 	// 	return res.status(400).json({
+// 	// 		errorMessage: `Product's Image Isn't Right Type`,
+// 	// 		statusCode: errorCode
+// 	// 	})
+// 	// }
+
+// 	for (let i = 0; i < prodImage.length; i++) {
+// 		const newProdImage = {
+// 			prod_img_product_id: prodId,
+// 			prod_img_src: prodImage[i].src
+// 		}
+
+// 		await productImagesModel.create(newProdImage)
+// 	}
+	
+// 	return res.status(200).json({
+// 		statusCode: successCode
+// 	})
+// })
 
 router.post('/update-description', sellerValidation.updateDescription, async (req, res) => {
 	const { prodId, prodDescription } = req.body
