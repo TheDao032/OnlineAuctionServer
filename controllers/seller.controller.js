@@ -183,7 +183,7 @@ router.post('/update-product', sellerValidation.updateProduct, async (req, res) 
 	}
 
 	if (prodBeginPrice) {
-		if (parseFLoat(prodBeginPrice) < 0) {
+		if (parseFloat(prodBeginPrice) < 0) {
 			return res.status(400).json({
 				errorMessage: `Product Begin Price Can't Smaller Than 0`,
 				statusCode: errorCode
@@ -195,7 +195,7 @@ router.post('/update-product', sellerValidation.updateProduct, async (req, res) 
 	}
 
 	if (prodStepPrice) {
-		if (parseFLoat(prodStepPrice) < 1) {
+		if (parseFloat(prodStepPrice) < 1) {
 			return res.status(400).json({
 				errorMessage: `Product Step Price Can't Smaller Than 1`,
 				statusCode: errorCode
@@ -207,7 +207,7 @@ router.post('/update-product', sellerValidation.updateProduct, async (req, res) 
 	}
 
 	if (prodBuyPrice) {
-		if (parseFLoat(prodBuyPrice) < 1) {
+		if (parseFloat(prodBuyPrice) < 1) {
 			return res.status(400).json({
 				errorMessage: `Product Buy Price Can't Smaller Than 1`,
 				statusCode: errorCode
@@ -257,14 +257,16 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 
 	allProdImages = await productImagesModel.findAll()
 
-	for (let i = 0; i < prodImageDel.length; i++) {
-		checkExistProdImage = allProdImages.find((item) => item.prod_img_id === prodImageDel[0].prodImgId)
-
-		if (checkExistProdImage) {
-			await productImagesModel.del(item.prod_img_id)
+	if (prodImageDel && prodImageDel.length !== 0) {
+		for (let i = 0; i < prodImageDel.length; i++) {
+			let checkExistProdImage = allProdImages.find((item) => item.prod_img_id === prodImageDel[i].prodImgId)
+	
+			if (checkExistProdImage) {
+				await productImagesModel.delById(checkExistProdImage.prod_img_id)
+			}
 		}
 	}
-
+	
 	if (!prodImage || prodImage.length === 0) {
 		return res.status(400).json({
 			errorMessage: `Image Is Required`,
@@ -303,6 +305,7 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 
 	for (let i = 0; i < prodImage.length; i++) {
 		const prodImageInfo = {
+			prod_img_product_id: prodId,
 			prod_img_src: prodImage[i].src
 		}
 	
@@ -621,7 +624,7 @@ router.post('/delete-product', sellerValidation.deleteProduct, async (req, res) 
 		})
 	}
 
-	await productImagesModel.del(prodId)
+	await productImagesModel.delByProdId(prodId)
 
 	await productDescriptionModel.del(prodId)
 

@@ -34,9 +34,14 @@ const update = async (prodImageId, prodImageInfo) => {
 		.where({ prod_img_id: prodImageId })
 }
 
-const del = async (prodId) => {
+const delByProdId = async (prodId) => {
 	await knex('tbl_product_images').del()
 		.where({ prod_img_product_id: prodId })
+}
+
+const delById = async (prodImgId) => {
+	await knex('tbl_product_images').del()
+		.where({ prod_img_id: prodImgId })
 }
 
 module.exports = {
@@ -46,5 +51,6 @@ module.exports = {
     findAll,
 	update,
 	findByIdAndProd,
-	del
+	delByProdId,
+	delById
 }
