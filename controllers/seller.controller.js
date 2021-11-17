@@ -256,16 +256,6 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 	const { prodId, prodImage, prodImageDel } = req.body
 
 	allProdImages = await productImagesModel.findAll()
-
-	if (prodImageDel && prodImageDel.length !== 0) {
-		for (let i = 0; i < prodImageDel.length; i++) {
-			let checkExistProdImage = allProdImages.find((item) => item.prod_img_id === prodImageDel[i].prodImgId)
-	
-			if (checkExistProdImage) {
-				await productImagesModel.delById(checkExistProdImage.prod_img_id)
-			}
-		}
-	}
 	
 	if (!prodImage || prodImage.length === 0) {
 		return res.status(400).json({
@@ -292,7 +282,15 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 		})
 	}
 
-
+	if (prodImageDel && prodImageDel.length !== 0) {
+		for (let i = 0; i < prodImageDel.length; i++) {
+			let checkExistProdImage = allProdImages.find((item) => item.prod_img_id === prodImageDel[i].prodImgId)
+	
+			if (checkExistProdImage) {
+				await productImagesModel.delById(checkExistProdImage.prod_img_id)
+			}
+		}
+	}
 
 	// const checkValidImage = imageproductValidation.validateValidImage(prodImage.image)
 	
