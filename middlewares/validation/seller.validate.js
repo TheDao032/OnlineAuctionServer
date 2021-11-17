@@ -47,7 +47,7 @@ const newProduct = (req, res, next) => {
 }
 
 const updateProduct = (req, res, next) => {
-	const shemaBody = {
+	const shema = {
 		type: 'object',
 		properties: {
 			prodId: { type: 'integer' },
@@ -65,12 +65,12 @@ const updateProduct = (req, res, next) => {
 		allErrors: true
 	})
 
-	const validatorBody = ajv.compile(shemaBody)
-	const validBody = validatorBody(req.body)
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
 
-	if (!validBody) {
+	if (!valid) {
 		return res.status(400).json({
-			errorMessage: validParams.errors[0].message,
+			errorMessage: validator.errors[0].message,
 			statusCode: errorCode
 		})
 	}
@@ -79,7 +79,7 @@ const updateProduct = (req, res, next) => {
 }
 
 const updateImage = (req, res, next) => {
-	const shemaBody = {
+	const shema = {
 		type: 'object',
 		properties: {
 			prodId: { type: 'integer' },
@@ -92,12 +92,12 @@ const updateImage = (req, res, next) => {
 		allErrors: true
 	})
 
-	const validatorBody = ajv.compile(shemaBody)
-	const validBody = validatorBody(req.body)
+	const validator = ajv.compile(shema)
+	const valid = validator(req.body)
 
-	if (!validBody) {
+	if (!valid) {
 		return res.status(400).json({
-			errorMessage: validParams.errors[0].message,
+			errorMessage: validator.errors[0].message,
 			statusCode: errorCode
 		})
 	}
