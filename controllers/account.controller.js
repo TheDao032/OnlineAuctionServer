@@ -200,6 +200,40 @@ router.post('/update-password', accountValidation.updateAccountPassword, async (
 	})
 })
 
+router.post('/reset-password', accountValidation.resetAccountPassword, async (req, res) => {
+	const { accId, accNewPassword } = req.body
+	const { accRole } = req.account
+
+	if (!roleModel.checkAdminRole(accRole)) {
+		return res.status(400).json({
+			errorMessage: 'Permission Access Denied'
+		})
+	}
+
+	const accInfo = await accountModel.findById(accId)
+
+	if (accInfo.length === 0) {
+		return res.status(400).json({ 
+			errorMessage: 'User Does Not Exist',
+			statusCode: errorCode
+		})
+	}
+
+	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
+
+	const hashPassword = bcrypt.hashSync(accNewPassword, 3)
+	const accountInfo = {
+		acc_password: hashPassword,
+		acc_updated_date: presentDate
+	}
+
+	await accountModel.update(accId, accountInfo)
+
+	return res.status(200).json({
+		statusCode: successCode
+	})
+})
+
 router.post('/delete', accountValidation.deleteAccount, async (req, res) => {
 	const { accId } = req.body
 	const { accRole } = req.account

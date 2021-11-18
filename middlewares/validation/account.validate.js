@@ -31,6 +31,34 @@ const updateAccountPassword = (req, res, next) => {
  	next()
 }
 
+const resetAccountPassword = (req, res, next) => {
+	const shema = {
+		type: 'object',
+		properties: {
+		  accId: { type: 'integer' },
+		  accNewPassword: { type: 'string', pattern: '', minLength: 1 }
+		},
+	  	required: ['accId', 'accNewPassword'],
+	  	additionalProperties: true
+  	}
+
+  	const ajv = new ajvLib({
+	  	allErrors: true
+  	})
+
+  	const validator = ajv.compile(shema)
+  	const valid = validator(req.body)
+
+  	if (!valid) {
+		return res.status(400).json({
+			errorMessage: validator.errors[0].message,
+			statusCode: errorCode
+		})
+  	}
+
+ 	next()
+}
+
 const updateRoleAccount = (req, res, next) => {
 	const shema = {
   		type: 'object',
@@ -262,5 +290,6 @@ module.exports = {
 	queryInfo,
 	deleteAccount,
 	updateStatusAccount,
-	upgradeRoleAccount
+	upgradeRoleAccount,
+	resetAccountPassword
 }
