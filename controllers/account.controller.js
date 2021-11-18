@@ -10,6 +10,9 @@ const accountModel = require('../models/account.model')
 const roleModel = require('../models/role.model')
 const commentModel = require('../models/comment.model')
 
+const mailService = require('../services/mailService')
+const mailOptions = require('../template/mailOptions')
+
 const successCode = 0
 const errorCode = 1
 
@@ -201,7 +204,7 @@ router.post('/update-password', accountValidation.updateAccountPassword, async (
 })
 
 router.post('/reset-password', accountValidation.resetAccountPassword, async (req, res) => {
-	const { accId, accNewPassword } = req.body
+	const { accId } = req.body
 	const { accRole } = req.account
 
 	if (!roleModel.checkAdminRole(accRole)) {
@@ -221,13 +224,15 @@ router.post('/reset-password', accountValidation.resetAccountPassword, async (re
 
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
-	const hashPassword = bcrypt.hashSync(accNewPassword, 3)
+	const hashPassword = bcrypt.hashSync('ABC123', 3)
 	const accountInfo = {
 		acc_password: hashPassword,
 		acc_updated_date: presentDate
 	}
 
 	await accountModel.update(accId, accountInfo)
+
+	await mailService.sendMail(mailOptions.resetPasswordOptions(accEmail, accEmail, 'ABC123'), req, res)
 
 	return res.status(200).json({
 		statusCode: successCode
