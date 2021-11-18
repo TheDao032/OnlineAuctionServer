@@ -158,7 +158,7 @@ const deleteAccount = (req, res, next) => {
 	})
 
 	const validator = ajv.compile(shema)
-	const valid = validator(req.params)
+	const valid = validator(req.body)
 
 	if (!valid) {
 		return res.status(400).json({
