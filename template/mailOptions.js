@@ -17,6 +17,21 @@ const registerOptions = (to, cusEmail, token) => {
     
 }
 
+const resetPasswordOptions = (to, cusEmail, newPassword) => {
+    return {
+        from: {
+            name: 'ABC_OnlineAuction',
+            email: `${environment.mailConfig.user}`
+        },
+        to: `${to}`,
+        subject: 'Reset Password By Admin',
+        html: ` <h1>Chào ${cusEmail} thân mến! </h1><br>
+                <h3>Chúng tôi đã reset password tài khoản ${to}, mật khẩu của bạn sẽ là ${newPassword}</h3>
+                <h3>Trân trọng!</h3>`
+    }
+    
+}
+
 const offerSuccessOwnerOptions = (to, ownerEmail, prodName, offerPrice) => {
     return {
         from: {
@@ -143,5 +158,6 @@ module.exports = {
     verifyBillOptions,
     offerSuccessOwnerOptions,
     offerSuccessOptions,
-    takePermissionOptions
+    takePermissionOptions,
+    resetPasswordOptions
 }

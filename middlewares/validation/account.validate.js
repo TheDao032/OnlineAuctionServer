@@ -35,10 +35,9 @@ const resetAccountPassword = (req, res, next) => {
 	const shema = {
 		type: 'object',
 		properties: {
-		  accId: { type: 'integer' },
-		  accNewPassword: { type: 'string', pattern: '', minLength: 1 }
+		  accId: { type: 'integer' }
 		},
-	  	required: ['accId', 'accNewPassword'],
+	  	required: ['accId'],
 	  	additionalProperties: true
   	}
 
