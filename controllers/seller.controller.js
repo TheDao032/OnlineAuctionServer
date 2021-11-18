@@ -275,7 +275,16 @@ router.post('/update-image', sellerValidation.updateImage, async (req, res) => {
 
 	const checkExistProdImage = await productImagesModel.findByProdId(prodId)
 
-	if (checkExistProdImage.length + prodImage.length > 4) {
+	const filterDelImg = checkExistProdImage.filter((item) => {
+		for (let i = 0; i < prodImageDel.length; i++) {
+			if (prodImageDel[i].prodImgId === item.prod_img_id) {
+				return false
+			}
+		}
+		return true
+	})
+
+	if (filterDelImg.length + prodImage.length > 4) {
 		return res.status(400).json({
 			errorMessage: `Already Have ${checkExistProdImage.length} Image, Maximum Image Is 4`,
 			statusCode: errorCode
