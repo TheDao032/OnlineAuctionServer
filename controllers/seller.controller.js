@@ -693,7 +693,7 @@ router.post('/take-permission', sellerValidation.takePermission, async (req, res
 	const presentDate = moment().format('YYYY-MM-DD HH:mm:ss')
 
 	const updatePermission = {
-		per_can_auction: 1,
+		per_can_auction: -1,
 		per_updated_date: presentDate
 	}
 
