@@ -93,6 +93,15 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0)
 
 			if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
+				if (biggestBidder) {
+					const updateBiggest = {
+						stt_is_biggest: 1,
+						stt_updated_date: presentDate
+					}
+
+					await auctionStatusModel.updateWithProdId(biggestBidder.stt_prod_id, updateBiggest)
+				}
+				
 				const auctionInfo = {
 					auc_prod_id: prodId,
 					auc_bidder_id: accId,
@@ -124,15 +133,6 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
 				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
-
-				if (biggestBidder) {
-					const updateBiggest = {
-						stt_is_biggest: 1,
-						stt_updated_date: presentDate
-					}
-
-					await auctionStatusModel.updateWithProdId(biggestBidder.stt_prod_id, updateBiggest)
-				}
 
 				return res.status(200).json({
 					statusCode: successCode
@@ -289,6 +289,15 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0)
 
 			if (aucPriceOffer >= prodInfo[0].prod_buy_price) {
+				if (biggestBidder) {
+					const updateBiggest = {
+						stt_is_biggest: 1,
+						stt_updated_date: presentDate
+					}
+
+					await auctionStatusModel.updateWithProdId(biggestBidder.stt_prod_id, updateBiggest)
+				}
+				
 				const auctionInfo = {
 					auc_prod_id: prodId,
 					auc_bidder_id: accId,
@@ -320,15 +329,6 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
 				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
-
-				if (biggestBidder) {
-					const updateBiggest = {
-						stt_is_biggest: 1,
-						stt_updated_date: presentDate
-					}
-
-					await auctionStatusModel.updateWithProdId(biggestBidder.stt_prod_id, updateBiggest)
-				}
 
 				return res.status(200).json({
 					statusCode: successCode
@@ -459,16 +459,31 @@ router.get('/attend-auction', bidderValidation.queryInfo, async (req, res) => {
 	const allProducts = await productModel.findAll()
 	const allAccount = await accountModel.findAll()
 	const prodImages = await productImageModel.findAll()
+	const listBidder = await auctionStatusModel.findAll()
 	const listAttend = await auctionModel.findAttendAuction(accId)
 
 	const result = await Promise.all([
 		listAttend.map((element) => {
 			const prodInfo = allProducts.find((item) => item.prod_id === element.auc_prod_id)
 
+			const biggestBidder = listBidder.find((item) => item.stt_is_biggest === 0 && item.stt_prod_id === prodInfo.prod_id)
+			let bidderInfo
+			if (biggestBidder) {
+				bidderInfo = allAccount.filter((item) => item.acc_id === biggestBidder.stt_bidder_id).map((element) => {
+					return {
+						accId: element.acc_id,
+						accName: element.acc_full_name || '',
+						accEmail: element.acc_email,
+					}
+				})
+			}
+
+			
+
 			const sellerInfo = allAccount.filter((item) => item.acc_id === prodInfo.prod_acc_id).map((item) => {
 				return {
 					accId: item.acc_id,
-					accName: item.acc_full_name,
+					accName: item.acc_full_name || '',
 					accEmail: item.acc_email
 				}
 			})
@@ -489,6 +504,7 @@ router.get('/attend-auction', bidderValidation.queryInfo, async (req, res) => {
 				prodStepPrice: prodInfo.prod_step_price,
 				prodBuyPrice: prodInfo.prod_buy_price,
 				prodImages: prodImageInfo || [],
+				biggestBidder: bidderInfo[0],
 				seller: sellerInfo[0],
 				createDate: moment(prodInfo.prod_created_date).format('YYYY-MM-DD HH:mm:ss'),
 				expireDate: moment(prodInfo.prod_expired_date).format('YYYY-MM-DD HH:mm:ss')
