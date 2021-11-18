@@ -396,7 +396,7 @@ router.get('/list-biggest-price', async (req, res) => {
 	const listBidder = await auctionStatusModel.findAll()
 	const allAccount = await accountModel.findAll()
 
-	const listFilter = allProduct.sort((a, b) => b.prod_begin_price - a.prod_begin_price)
+	const listFilter = allProduct.sort((a, b) => b.prod_begin_price - a.prod_begin_price).filter((item) => moment(item.prod_expired_date) > moment())
 
 	const result = listFilter.map((element) => {
 		const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === element.prod_id).map((info) => {
