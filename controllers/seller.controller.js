@@ -14,6 +14,7 @@ const auctionStatusModel = require('../models/auctionStatus.model')
 const auctionPermissionModel = require('../models/auctionPermission.model')
 const accountModel = require('../models/account.model')
 const commentModel = require('../models/comment.model')
+const watchModel = require('../models/watch.model')
 
 const sellerValidation = require('../middlewares/validation/seller.validate')
 const productValidation = require('../middlewares/validation/product.validate')
@@ -634,6 +635,8 @@ router.post('/delete-product', sellerValidation.deleteProduct, async (req, res) 
 	await productImagesModel.delByProdId(prodId)
 
 	await productDescriptionModel.del(prodId)
+
+	await watchModel.delByProdId(prodId)
 
 	await productModel.del(prodId)
 

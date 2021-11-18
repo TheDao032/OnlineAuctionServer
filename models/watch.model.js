@@ -37,10 +37,22 @@ const addWatch = async (watchInfo) => {
 	return returnInfo[0]
 }
 
+const delById = async (watchId) => {
+	await knex('tbl_watch').del()
+			.where({ watch_id: watchId })
+}
+
+const delByProdId = async (prodId) => {
+	await knex('tbl_watch').del()
+			.where({ watch_prod_id: prodId })
+}
+
 module.exports = {
 	findByAccAndProduct,
 	findByAcc,
 	updateWatch,
 	addWatch,
-	findById
+	findById,
+	delByProdId,
+	delById
 }
