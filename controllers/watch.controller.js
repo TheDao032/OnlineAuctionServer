@@ -34,7 +34,17 @@ router.get('/list', watchValidation.queryInfo, async (req, res) => {
 		listWatch.map((item) => {
 			const productInfo = listProduct.find((info) => info.prod_id === item.watch_prod_id)
 
-			const prodImageInfo = prodImages.filter((item) => item.prod_img_product_id === productInfo.prod_id).map((info) => {
+			const prodImageInfo = prodImages.filter((item) => {
+				if (productInfo) {
+					return false
+				}
+
+				if (item.prod_img_product_id === productInfo.prod_id) {
+					return true
+				}
+				
+				return false
+			}).map((info) => {
 				return {
 					prodImgId: info.prod_img_id,
 					prodImgProductId: info.prod_img_product_id,
