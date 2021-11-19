@@ -172,11 +172,59 @@ const queryInfo = (req, res, next) => {
 	next()
 }
 
+const listCommentWithAccId = (req, res, next) => {
+	const shemaBody = {
+		type: 'object',
+		properties: {
+			accId: { type: 'integer' }
+		},
+		required: ['accId'],
+		additionalProperties: true
+	}
+
+	const ajv = new ajvLib({
+		allErrors: true
+	})
+
+	const validatorBody = ajv.compile(shemaBody)
+	const validBody = validatorBody(req.body)
+
+	const shemaQuery = {
+		type: 'object',
+		properties: {
+		  page: { type: 'string', pattern: '^\\d+$' },
+		  limit: { type: 'string', pattern: '^\\d+$' }
+		},
+		required: [],
+		additionalProperties: true
+	}
+
+	const validatorQuery = ajv.compile(shemaQuery)
+	const validQuery = validatorQuery(req.query)
+	
+	if (!validBody) {
+		return res.status(400).json({
+			errorMessage: validatorBody.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	if (!validQuery) {
+		return res.status(400).json({
+			errorMessage: validatorQuery.errors[0].message,
+			statusCode: errorCode
+		})
+	}
+
+	next()
+}
+
 module.exports = {
     newComment,
 	updateComment,
 	deleteComment,
 	listComment,
 	badComment,
-	queryInfo
+	queryInfo,
+	listCommentWithAccId
 }
