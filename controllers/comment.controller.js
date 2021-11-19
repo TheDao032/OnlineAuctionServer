@@ -213,7 +213,7 @@ router.get('/other-comment', async (req, res) => {
     })
 })
 
-router.post('/list-comment', commentValidation.queryInfo, async (req, res) => {
+router.post('/list-comment', commentValidation.listCommentWithAccId, async (req, res) => {
     const { page, limit } = req.query
     const { accId } = req.body
 
