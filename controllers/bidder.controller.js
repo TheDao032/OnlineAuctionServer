@@ -130,7 +130,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 				await productModel.update(productInfo, prodInfo[0].prod_id)
 
-				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name, aucPriceOffer), req, res)
 
 				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
@@ -171,7 +171,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 					await productModel.update(productInfo, prodInfo[0].prod_id)
 
-					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name, aucPriceOffer), req, res)
 
 					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
@@ -227,7 +227,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 					await productModel.update(productInfo, prodInfo[0].prod_id)
 
-					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name, aucPriceOffer), req, res)
 
 					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
@@ -326,7 +326,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 				await productModel.update(productInfo, prodInfo[0].prod_id)
 
-				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+				await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name, aucPriceOffer), req, res)
 
 				await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
@@ -365,7 +365,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 					await productModel.update(productInfo, prodInfo[0].prod_id)
 
-					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name, aucPriceOffer), req, res)
 
 					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
@@ -421,7 +421,7 @@ router.post('/offer', bidderValidation.offer, async (req, res) => {
 
 					await productModel.update(productInfo, prodInfo[0].prod_id)
 
-					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name), req, res)
+					await mailService.sendMail(mailOptions.offerSuccessOwnerOptions(accountInfo[0].acc_email, accountInfo[0].acc_email, prodInfo[0].prod_name, aucPriceOffer), req, res)
 
 					await mailService.sendMail(mailOptions.offerSuccessOptions(sellerInfo[0].acc_email, sellerInfo[0].acc_email, prodInfo[0].prod_name), req, res)
 
