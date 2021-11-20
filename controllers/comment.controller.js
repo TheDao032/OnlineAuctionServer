@@ -217,7 +217,7 @@ router.post('/list-comment', commentValidation.listCommentWithAccId, async (req,
     const { page, limit } = req.query
     const { accId } = req.body
 
-    const commentInfo = await commentModel.findByFromId(accId)
+    const commentInfo = await commentModel.findByToId(accId)
 
     if (commentInfo.length === 0) {
         return res.status(200).json({
